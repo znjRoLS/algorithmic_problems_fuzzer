@@ -3,30 +3,13 @@
 #include <ctime>
 #include <sstream>
 
+#include "binary_runner.h"
+
 using namespace std;
 
 //TODO: make template
 inline void SetRandomVar(int x_min, int x_max, int &x) {
 	x = rand() % (x_max - x_min + 1) + x_min;
-}
-
-string RunBinary(const string& binary_name, const string& input) {
-	FILE *in;
-  char buff[512];
- 
-	stringstream program_output;
-
-  if(!(in = popen(binary_name.c_str(), "r"))){
-      return "";
-  }
- 
-  while(fgets(buff, sizeof(buff), in)!=NULL){
-		program_output << buff;
-//		cout << buff;
-  }
-  pclose(in);
-
-	return program_output.str();	
 }
 
 int main() { 
@@ -65,7 +48,18 @@ int main() {
 		program_input << endl;
 	}
 
-	cout << RunBinary("pwd","");
+	string dir = "../spoj_cpp/";
+	//string dir = "bin/";
+	//string dir = "";
+	string cmd = "horrible";
+
+	Binary prog(dir, cmd);
+
+	cout << "Running: " << dir << cmd << endl;
+	cout <<	"With input: " << program_input.str() << endl;
+
+	string output = prog.Run(program_input.str());
+	cout << "Output: " << output << endl;
 
 	return 0;
 }
