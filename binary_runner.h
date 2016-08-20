@@ -5,7 +5,7 @@ using namespace std;
 
 class Binary {
 	public:
-		Binary(string dir, string cmd);
+		Binary(string cmd);
 		string Run(string input);
 	private:
 		string dir, cmd;

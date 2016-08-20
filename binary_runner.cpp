@@ -4,8 +4,7 @@
 
 #include "binary_runner.h"
 
-Binary::Binary(string _dir, string _cmd):
-	dir(_dir),
+Binary::Binary(string _cmd):
 	cmd(_cmd) {
 
 }
@@ -99,7 +98,8 @@ string Binary::Run(string input) {
 			close(pipefrom[1]);
 			/* call od as an example, with hex and char output */
 			
-			execlp((dir + cmd).c_str(), cmd.c_str(), (char *)NULL );
+			execlp(cmd.c_str(), cmd.c_str(), (char *)NULL );
+			cout << "error, so executing cat...." << endl;
 			execlp("/bin/cat", "/bin/cat", (char *)NULL);
 			perror("execlp()");
 			exit(255);
@@ -131,8 +131,8 @@ string Binary::Run(string input) {
 
 	string output = GetOutput(pipefrom[0]);
 
-	//int status;
-	//waitpid(nPid, &status, 0);
+	int status;
+	waitpid(nPid, &status, 0);
 
 	return output;
 }
