@@ -21,7 +21,8 @@ class Config {
 		Config(char *filename);
 		vector<string> GetBinaries();
 	private:
-		void parse(ifstream& config_file);
+		void Parse(ifstream& config_file);
+		void ParseInput(string input);
 		
 		vector<string> binaries;
 
@@ -35,16 +36,29 @@ Config::Config(char *filename) {
 		exit(255);
 	}
 
-	Config::parse(config_file);
+	Config::Parse(config_file);
 }
 
-void Config::parse(ifstream& config_file) {
+void Config::Parse(ifstream& config_file) {
 	string line;
 
 	unordered_map<string,string> conf;
 
 	while (1) {
 		config_file >> line;
+		
+		if (line == INPUT_START_LINE) {
+			stringstream input_config;
+			while (1) {
+				config_file >> line;
+				if (line == INPUT_END_LINE) {
+					config_file >> line;
+					Config::ParseInput(input_config.str());
+					break;
+				}
+				input_config << line;
+			}
+		}
 
 		if (config_file.eof()) break;
 
@@ -68,6 +82,10 @@ void Config::parse(ifstream& config_file) {
 
 }
 
+void Config::ParseInput(string input) {
+	
+}
+
 vector<string> Config::GetBinaries() {
 	return binaries;
 }
@@ -84,11 +102,11 @@ int main(int argc, char **argv) {
 	int t = 1;
 
 	const int n_min = 1;
-	const int n_max = 10;
+	const int n_max = 1000;
 	int n;
 	
 	const int c_min = 1;
-	const int c_max = 10;
+	const int c_max = 100;
 	int c;
 
 	srand(time(0));
@@ -109,9 +127,9 @@ int main(int argc, char **argv) {
 			int b,p,q,v;
 
 			SetRandomVar(0,1,b);
-			SetRandomVar(0,n-1,p);
-			SetRandomVar(p,n-1,q);
-			SetRandomVar(0,10,v);
+			SetRandomVar(1,n,p);
+			SetRandomVar(p,n,q);
+			SetRandomVar(0,10000000,v);
 
 			program_input << b << " " << p << " " << q;
 			if (b == 0) program_input << " " << v;
