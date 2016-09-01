@@ -8,87 +8,9 @@
 
 #include "split.h"
 #include "binary_runner.h"
+#include "config.h"
 
 using namespace std;
-
-//TODO: make template
-inline void SetRandomVar(int x_min, int x_max, int &x) {
-	x = rand() % (x_max - x_min + 1) + x_min;
-}
-
-class Config {
-	public:
-		Config(char *filename);
-		vector<string> GetBinaries();
-	private:
-		void Parse(ifstream& config_file);
-		void ParseInput(string input);
-		
-		vector<string> binaries;
-
-};
-
-Config::Config(char *filename) {
-	ifstream config_file(filename);
-
-	if (!config_file.is_open()) {
-		cout << "Error opening file " << filename << endl;
-		exit(255);
-	}
-
-	Config::Parse(config_file);
-}
-
-void Config::Parse(ifstream& config_file) {
-	string line;
-
-	unordered_map<string,string> conf;
-
-	while (1) {
-		config_file >> line;
-		
-		if (line == INPUT_START_LINE) {
-			stringstream input_config;
-			while (1) {
-				config_file >> line;
-				if (line == INPUT_END_LINE) {
-					config_file >> line;
-					Config::ParseInput(input_config.str());
-					break;
-				}
-				input_config << line;
-			}
-		}
-
-		if (config_file.eof()) break;
-
-		vector<string> tokens = split(line, '=');
-		if (tokens.size() != 2) {
-			cout << "Error while parsing config!" << endl;
-			exit(255);
-		}
-
-		conf[tokens[0]] = tokens[1];
-	}
-
-	string bin_prefix = conf["binary_prefix"];
-	string binaries_string = conf["binaries"];
-
-	vector<string> binaries_vector = split(binaries_string, ',');
-	
-	for(string& binary: binaries_vector) {
-		binaries.push_back(bin_prefix + binary);
-	}
-
-}
-
-void Config::ParseInput(string input) {
-	
-}
-
-vector<string> Config::GetBinaries() {
-	return binaries;
-}
 
 int main(int argc, char **argv) { 
 
