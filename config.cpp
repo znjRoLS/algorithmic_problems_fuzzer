@@ -1,52 +1,15 @@
-//TODO: make template
-inline void SetRandomVar(int x_min, int x_max, int &x) {
-	x = rand() % (x_max - x_min + 1) + x_min;
-}
+#include "config.h"
+#include "split.h"
 
+#include <memory>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+#include <unordered_map>
 
-class Variable {
-	public:
-		void SetUpperLimit(shared_ptr<Variable> var)
-		{ upperVar = var; isUpperLimitVar = true; }
-		void SetLowerLimit(shared_ptr<Variable> var)
-		{ lowerVar = var; isLowerLimitVar = true;	}
-		string GetValue() = 0;
-		void GenerateValue() = 0;
-	private:
-		bool isUpperLimitVar;
-		bool isLowerLimitVar;
-
-		shared_ptr<Variable> lowerVar;
-		shared_ptr<Variable> upperVar;	
-};
-
-class VariableInt: public Variable {
-	public:
-		override string GetValue()
-		{ return itos(value); };
-		override void GenerateValue();
-
-		void SetUpperLimit(int val)
-		{ upperInt = val; isUpperLimitVar = false; }
-		void SetLowerLimit(int val)
-		{ lowerInt = val; isLowerLimitVar = false; }
-
-	private:
-		int upperInt;
-		int lowerInt;
-		int value;
-}
-
-void VariableInt::GenerateValue() {
-	if (isUpperLimitVar) {
-		upperInt = upperVar->GetValue();
-	}
-	if (isLowerLimitVar) {
-		lowerInt = lowerVar->GetValue();
-	}
-
-	SetRandomVar(lowerInt, upperInt, &value);
-}
+using namespace std;
 
 
 Config::Config(char *filename) {
@@ -59,6 +22,8 @@ Config::Config(char *filename) {
 
 	Config::Parse(config_file);
 }
+
+
 
 void Config::Parse(ifstream& config_file) {
 	string line;
@@ -97,7 +62,7 @@ void Config::Parse(ifstream& config_file) {
 			stringstream input_config;
 			while (1) {
 				config_file >> line;
-				if (line == CONSTAINTS_END_LINE) {
+				if (line == CONSTRAINTS_END_LINE) {
 					config_file >> line;
 					Config::ParseConstraints(input_config.str());
 					break;
@@ -129,28 +94,47 @@ void Config::Parse(ifstream& config_file) {
 
 }
 
-void Config::ParseConstraints(string input) {
-
-}
-
 void Config::ParseVar(string input) {
 	//TODO add if already parsed this section.
-	
-	vector<string> tokens = split(line, '=');
 
-	vector<string> vars = split(tokens, ',');
+    stringstream inputstream;
+    inputstream << input;
 
-	if (tokens[0] == "int") {
-		
+    while (!inputstream.eof()) {
+        string line;
+        inputstream >> line;
+
+        vector<string> tokens = split(line, ':');
+        vector<string> vars = split(tokens[1], ',');
+
+        //TODO@rols: check if exists
+        if (tokens[0] == "int") {
+            for(string &token: vars) {
+                vars[token] =  new VariableInt();
+            }
+        }
+    }
+}
+
+
+
+void Config::ParseInput(string input) {
+
+	rootBlock = unique_ptr<BlockComposition*>(new BlockComposition());
+
+	stringstream inputstream;
+	inputstream << input;
+
+	if (!GetNextInputBlock(inputstream, rootBlock)) {
+		cout << "Error opening file " << filename << endl;
+		exit(255);
 	}
 }
 
-void Config::ParseInput(string input) {
-	
+void Config::ParseConstraints(string input) {
+
 }
 
 vector<string> Config::GetBinaries() {
 	return binaries;
 }
-
-
