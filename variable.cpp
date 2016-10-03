@@ -11,16 +11,37 @@
 
 using namespace std;
 
+bool isSeedSet = false;
+
+inline void SetSeedIfNeeded(){
+    if (!isSeedSet) {
+        isSeedSet = true;
+        srand(time(NULL));
+    }
+}
+
 //TODO: make template
 inline void SetRandomVar(int x_min, int x_max, int &x) {
+    SetSeedIfNeeded();
     x = rand() % (x_max - x_min + 1) + x_min;
 }
 
 inline void SetRandomVar(double x_min, double x_max, double &x) {
+    SetSeedIfNeeded();
     x = (double)rand() / RAND_MAX;
     x = x_min + x * (x_max - x_min);
 }
 
+
+void Variable::SetUpperLimit(shared_ptr<Variable> var) {
+    upperVar = var;
+    isUpperLimitVar = true;
+}
+
+void Variable::SetLowerLimit(shared_ptr<Variable> var) {
+    lowerVar = var;
+    isLowerLimitVar = true;
+}
 
 void VariableInt::GenerateValue() {
     if (isUpperLimitVar) {

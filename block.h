@@ -19,49 +19,49 @@ enum BlockType {
 };
 
 //TODO: elegance, please
-const static unordered_map<char,int> BLOCK_CHARS = {
+static unordered_map<char,int> BLOCK_CHARS = {
         {'$', 0},
         {'*', 1},
         {'@', 2},
 };
 
-class block {
+class BlockComposition;
+
+class Block {
 public:
 
-    bool GetNextInputBlock(
+    static bool GetNextInputBlock(
             stringstream& input,
-            unique_ptr<BlockComposition*>& blockComposition
+            unique_ptr<BlockComposition>& blockComposition
     );
 
     static bool GetOneInputBlock(
             stringstream& input,
-            unique_ptr<block*>& block
+            unique_ptr<Block>& block
     );
 
     static bool ParseInputBlock(
             stringstream& input,
             BlockType blockType,
-            unique_ptr<block*>& block
+            unique_ptr<Block>& block
     );
 };
 
-class BlockSimple {
+class BlockSimple: public Block {
 
 };
 
-class BlockComposition {
+class BlockComposition: public Block {
 public:
-    void AddBlock(unique_ptr<block*> block) {
-        composition.push_back(block);
-    }
+    void AddBlock(unique_ptr<Block>& block);
 private:
     unique_ptr<Variable*> repeteVar;
-    vector<unique_ptr<block*> >  composition;
+    vector<unique_ptr<Block> >  composition;
 };
 
-class BlockCondition {
+class BlockCondition: public Block {
 private:
-    unique_ptr<Variable*> conditionVar;
+    unique_ptr<Variable> conditionVar;
 };
 
 

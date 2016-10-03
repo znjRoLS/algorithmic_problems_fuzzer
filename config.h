@@ -27,5 +27,5 @@ class Config {
 		
 		vector<string> binaries;
 		unordered_map<string,shared_ptr<Variable>> vars;
-		unique_ptr<BlockComposition*> rootBlock;
+		unique_ptr<BlockComposition> rootBlock;
 };

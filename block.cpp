@@ -4,9 +4,11 @@
 
 #include "block.h"
 
-bool block::GetNextInputBlock(stringstream& input, unique_ptr<BlockComposition*>& blockComposition) {
+#include <iostream>
+
+bool Block::GetNextInputBlock(stringstream& input, unique_ptr<BlockComposition>& blockComposition) {
     while(input) {
-        unique_ptr<block*> block;
+        unique_ptr<Block> block;
         if (GetOneInputBlock(input, block)) {
             blockComposition->AddBlock(block);
         }
@@ -17,7 +19,7 @@ bool block::GetNextInputBlock(stringstream& input, unique_ptr<BlockComposition*>
     return true;
 }
 
-bool block::GetOneInputBlock(stringstream& input, unique_ptr<block*>& block) {
+bool Block::GetOneInputBlock(stringstream& input, unique_ptr<Block>& block) {
     char c;
     stringstream token;
 
@@ -33,7 +35,7 @@ bool block::GetOneInputBlock(stringstream& input, unique_ptr<block*>& block) {
         if (!insideBlock) {
             if (BLOCK_CHARS.find(c) != BLOCK_CHARS.end()) {
                 insideBlock = true;
-                blockType = BLOCK_CHARS[c];
+                blockType = (BlockType)BLOCK_CHARS[c];
             }
             continue;
         }
@@ -41,16 +43,20 @@ bool block::GetOneInputBlock(stringstream& input, unique_ptr<block*>& block) {
         if (BLOCK_CHARS.find(c) != BLOCK_CHARS.end() && BLOCK_CHARS[c] == blockType) {
 
             if (!ParseInputBlock(token, blockType, block)) {
-                cout << "Error opening file " << filename << endl;
+                cout << "Error opening file " << endl;
                 exit(255);
             }
             break;
         }
-
         token << c;
     }
+    return true;
 }
 
-bool block::ParseInputBlock(stringstream& input, BlockType blockType, unique_ptr<block*>& block) {
+bool Block::ParseInputBlock(stringstream& input, BlockType blockType, unique_ptr<Block>& block) {
+    return true;
+}
 
+void BlockComposition::AddBlock(unique_ptr<Block>& block) {
+    composition.push_back(move(block));
 }

@@ -105,12 +105,12 @@ void Config::ParseVar(string input) {
         inputstream >> line;
 
         vector<string> tokens = split(line, ':');
-        vector<string> vars = split(tokens[1], ',');
+        vector<string> varsVector = split(tokens[1], ',');
 
         //TODO@rols: check if exists
         if (tokens[0] == "int") {
-            for(string &token: vars) {
-                vars[token] =  new VariableInt();
+            for(string &token: varsVector) {
+                vars[token] =  unique_ptr<Variable>(new VariableInt());
             }
         }
     }
@@ -120,13 +120,13 @@ void Config::ParseVar(string input) {
 
 void Config::ParseInput(string input) {
 
-	rootBlock = unique_ptr<BlockComposition*>(new BlockComposition());
+	rootBlock = unique_ptr<BlockComposition>(new BlockComposition());
 
 	stringstream inputstream;
 	inputstream << input;
 
-	if (!GetNextInputBlock(inputstream, rootBlock)) {
-		cout << "Error opening file " << filename << endl;
+	if (!Block::GetNextInputBlock(inputstream, rootBlock)) {
+		cout << "Error opening file " << endl;
 		exit(255);
 	}
 }

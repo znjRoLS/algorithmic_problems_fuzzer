@@ -12,15 +12,15 @@ using namespace std;
 
 class Variable {
 public:
-    void SetUpperLimit(shared_ptr<Variable> var)
-    { upperVar = var; isUpperLimitVar = true; }
-    void SetLowerLimit(shared_ptr<Variable> var)
-    { lowerVar = var; isLowerLimitVar = true;	}
+    void SetUpperLimit(shared_ptr<Variable> var);
+    void SetLowerLimit(shared_ptr<Variable> var);
     virtual string GetValue() = 0;
     virtual void GenerateValue() = 0;
 protected:
-    bool isUpperLimitVar;
-    bool isLowerLimitVar;
+    bool isUpperLimitVar = false;
+    bool isLowerLimitVar = false;
+    bool isUpperLimitSet = false;
+    bool isLowerLimitSet = false;
 
     shared_ptr<Variable> lowerVar;
     shared_ptr<Variable> upperVar;
@@ -32,6 +32,8 @@ public:
     string GetValue() override;
     void GenerateValue() override;
 
+    using Variable::SetLowerLimit;
+    using Variable::SetUpperLimit;
     void SetUpperLimit(int val);
     void SetLowerLimit(int val);
 
@@ -47,6 +49,8 @@ public:
     string GetValue() override;
     void GenerateValue() override;
 
+    using Variable::SetLowerLimit;
+    using Variable::SetUpperLimit;
     void SetUpperLimit(double val);
     void SetLowerLimit(double val);
 

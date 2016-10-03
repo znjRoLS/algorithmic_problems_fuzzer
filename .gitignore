@@ -1,4 +1,9 @@
+
+# CLion
 .idea
+
+# googletest
+Testing
 
 # Compiled Object files
 *.slo

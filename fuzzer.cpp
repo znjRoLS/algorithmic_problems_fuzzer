@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
 		
 		if (iter_num % 1000 == 0) cout << "Iteration " << iter_num << endl;
 
-		SetRandomVar(n_min, n_max, n);
-		SetRandomVar(c_min, c_max, c);
+		//SetRandomVar(n_min, n_max, n);
+		//SetRandomVar(c_min, c_max, c);
 
 		stringstream program_input;
 
@@ -48,10 +48,10 @@ int main(int argc, char **argv) {
 		for (int i = 0; i < c; i ++) {
 			int b,p,q,v;
 
-			SetRandomVar(0,1,b);
-			SetRandomVar(1,n,p);
-			SetRandomVar(p,n,q);
-			SetRandomVar(0,10000000,v);
+			//SetRandomVar(0,1,b);
+			//SetRandomVar(1,n,p);
+			//SetRandomVar(p,n,q);
+			//SetRandomVar(0,10000000,v);
 
 			program_input << b << " " << p << " " << q;
 			if (b == 0) program_input << " " << v;
