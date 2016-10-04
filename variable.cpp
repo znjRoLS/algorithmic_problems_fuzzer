@@ -94,3 +94,15 @@ void VariableDouble::SetLowerLimit(double val) {
     lowerInt = val;
     isLowerLimitVar = false;
 };
+
+void VariableIntConstant::GenerateValue() {
+}
+
+
+void VariableIntConstant::SetValue(int val) {
+    value = val;
+}
+
+string VariableIntConstant::GetValue() {
+    return to_string(value);
+};

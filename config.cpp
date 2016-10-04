@@ -120,12 +120,15 @@ void Config::ParseVar(string input) {
 
 void Config::ParseInput(string input) {
 
-	rootBlock = unique_ptr<BlockComposition>(new BlockComposition());
+	//rootBlock = unique_ptr<BlockComposition>(new BlockComposition());
+    shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
+    unityVar->SetValue(1);
+    rootBlock->SetRepeteVar(static_pointer_cast<Variable>(unityVar));
 
 	stringstream inputstream;
 	inputstream << input;
 
-	if (!Block::GetNextInputBlock(inputstream, rootBlock)) {
+	if (!Block::GetNextInputBlock(inputstream, rootBlock, vars)) {
 		cout << "Error opening file " << endl;
 		exit(255);
 	}

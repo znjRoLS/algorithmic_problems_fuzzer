@@ -26,6 +26,16 @@ protected:
     shared_ptr<Variable> upperVar;
 };
 
+class VariableIntConstant: public Variable {
+public:
+    string GetValue() override;
+    void GenerateValue() override;
+
+    void SetValue(int val);
+
+private:
+    int value;
+};
 
 class VariableInt: public Variable {
 public:

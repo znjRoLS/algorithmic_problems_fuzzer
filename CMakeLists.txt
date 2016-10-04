@@ -17,4 +17,5 @@ add_subdirectory (googletest/googletest)
 enable_testing()
 
 cxx_test(variable_test gtest_main variable.cpp)
+cxx_test(block_test gtest_main block.cpp variable.cpp)
 
