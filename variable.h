@@ -14,6 +14,8 @@ class Variable {
 public:
     void SetUpperLimit(shared_ptr<Variable> var);
     void SetLowerLimit(shared_ptr<Variable> var);
+    /*void SetUpperLimitInclusive(bool);
+    void SetLowerLimitInclusive(bool);*/
     virtual string GetValue() = 0;
     virtual void GenerateValue() = 0;
 protected:
@@ -21,6 +23,8 @@ protected:
     bool isLowerLimitVar = false;
     bool isUpperLimitSet = false;
     bool isLowerLimitSet = false;
+    /*bool isUpperLimitInclusive = false;
+    bool isLowerLimitInclusive = false;*/
 
     shared_ptr<Variable> lowerVar;
     shared_ptr<Variable> upperVar;

@@ -1,5 +1,5 @@
 #include "config.h"
-#include "split.h"
+#include "common.h"
 
 #include <memory>
 #include <iostream>
@@ -11,19 +11,22 @@
 
 using namespace std;
 
+Config::Config():
+    rootBlock(new BlockComposition()) {
 
-Config::Config(char *filename) {
-	ifstream config_file(filename);
-
-	if (!config_file.is_open()) {
-		cout << "Error opening file " << filename << endl;
-		exit(255);
-	}
-
-	Config::Parse(config_file);
 }
 
+void Config::OpenFile(char *filename) {
 
+    ifstream config_file(filename);
+
+    if (!config_file.is_open()) {
+        cout << "Error opening file " << filename << endl;
+        exit(255);
+    }
+
+    Config::Parse(config_file);
+}
 
 void Config::Parse(ifstream& config_file) {
 	string line;
@@ -128,6 +131,8 @@ void Config::ParseInput(string input) {
 	stringstream inputstream;
 	inputstream << input;
 
+    cout << input << " hehe" << endl;
+
 	if (!Block::GetNextInputBlock(inputstream, rootBlock, vars)) {
 		cout << "Error opening file " << endl;
 		exit(255);
@@ -136,12 +141,66 @@ void Config::ParseInput(string input) {
 
 void Config::ParseConstraints(string input) {
 
-	stringstream inputstream;
-	inputstream << input;
+	vector<string> lines = getLines(input);
 
+    //TODO:: handle '=' properly (shouldn't be found now)
+    static const vector<string> operatorTokens = {"<=", ">=", "=", "<", ">"};
+
+    for(string& line : lines) {
+        size_t found;
+        string foundToken;
+
+        for (auto& operatorToken : operatorTokens) {
+            found = line.find(operatorToken);
+            if (found!=std::string::npos) {
+                foundToken = operatorToken;
+                break;
+            }
+        }
+
+        string firstParam = line.substr(0,found);
+        string secondParam = line.substr(found + foundToken.size());
+        if (vars.find(firstParam) == vars.end()) {
+            cout << "parse errorr!";
+            exit(255);
+        }
+        shared_ptr<Variable> firstVar = vars[firstParam];
+
+
+        if (vars.find(secondParam) != vars.end()) {
+
+            firstVar->SetUpperLimit(vars[secondParam]);
+            continue;
+        }
+
+        shared_ptr<VariableInt> tryFirstCast = dynamic_pointer_cast<VariableInt>(firstVar);
+        if (!tryFirstCast) {
+            cout << "var not an int!";
+            exit(255);
+        }
+        //TODO: really? just int?
+        int second = stoi(secondParam);
+
+        if (foundToken == "<=") {
+            tryFirstCast->SetUpperLimit(second);
+        }
+        if (foundToken == ">=") {
+            tryFirstCast->SetLowerLimit(second);
+        }
+        if (foundToken == "<") {
+            tryFirstCast->SetUpperLimit(--second);
+        }
+        if (foundToken == ">") {
+            tryFirstCast->SetLowerLimit(++second);
+        }
+    }
 
 }
 
 vector<string> Config::GetBinaries() {
 	return binaries;
+}
+
+string Config::GetInput() {
+    return rootBlock->GetGeneratedText();
 }

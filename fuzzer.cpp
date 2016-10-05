@@ -6,7 +6,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "split.h"
+#include "common.h"
 #include "binary_runner.h"
 #include "config.h"
 
@@ -19,7 +19,9 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	Config config(argv[1]);
+	//Config config(argv[1]);
+	Config config;
+	config.OpenFile(argv[1]);
 
 	int t = 1;
 

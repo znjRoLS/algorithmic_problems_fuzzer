@@ -33,6 +33,32 @@ TEST(BlockSimple, BlockTests) {
     var->GenerateValue();
 
     string temp = rootBlock->GetGeneratedText();
+
+    EXPECT_EQ(temp, "3");
+}
+
+TEST(BlockSimpleMore, BlockTests) {
+    unordered_map<string, shared_ptr<Variable>> vars;
+
+    shared_ptr<VariableIntConstant> var = make_shared<VariableIntConstant>();
+    var->SetValue(3);
+    vars["x"] = static_pointer_cast<Variable>(var);
+
+    unique_ptr<BlockComposition> rootBlock (new BlockComposition());
+    shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
+    unityVar->SetValue(1);
+    rootBlock->SetRepeteVar(static_pointer_cast<Variable>(unityVar));
+
+    stringstream input;
+    input << "$x$$x$";
+
+    Block::GetNextInputBlock(input, rootBlock, vars);
+
+    var->GenerateValue();
+
+    string temp = rootBlock->GetGeneratedText();
+
+    EXPECT_EQ(temp, "3 3");
 }
 
 TEST(BlockRepeat, BlockTests) {

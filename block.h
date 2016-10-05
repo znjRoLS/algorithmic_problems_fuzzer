@@ -80,7 +80,6 @@ public:
     string GetGeneratedText() override;
     void AddBlock(unique_ptr<Block>& block);
     void SetRepeteVar(shared_ptr<Variable> var);
-    int getcompsize() { return composition.size(); }
 private:
     //TODO: only int variables?
     shared_ptr<Variable> repeteVar;

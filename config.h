@@ -16,9 +16,13 @@ const static string CONSTRAINTS_END_LINE = "/constraints";
 
 
 class Config {
+	friend class TestConfig;
 	public:
-		Config(char *filename);
+        Config();
+		void OpenFile(char *filename);
 		vector<string> GetBinaries();
+	//TODO: naming
+		string GetInput();
 	private:
 		void Parse(ifstream& config_file);
 		void ParseVar(string input);

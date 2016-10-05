@@ -43,6 +43,14 @@ void Variable::SetLowerLimit(shared_ptr<Variable> var) {
     isLowerLimitVar = true;
 }
 
+/*void Variable::SetUpperLimitInclusive(bool val) {
+    isUpperLimitInclusive = val;
+}
+
+void Variable::SetLowerLimitInclusive(bool val) {
+    isUpperLimitInclusive = val;
+}*/
+
 void VariableInt::GenerateValue() {
     if (isUpperLimitVar) {
         upperInt = stoi(upperVar->GetValue());
@@ -50,6 +58,11 @@ void VariableInt::GenerateValue() {
     if (isLowerLimitVar) {
         lowerInt = stoi(lowerVar->GetValue());
     }
+
+    /*int lowerLimit = lowerInt;
+    if (!isLowerLimitInclusive) lowerLimit++;
+    int upperLimit = upperInt;
+    if (!isUpperLimitInclusive) upperLimit--;*/
 
     SetRandomVar(lowerInt, upperInt, value);
 }
