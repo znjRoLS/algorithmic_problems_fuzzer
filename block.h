@@ -24,7 +24,7 @@ enum BlockType {
 static unordered_map<char,int> BLOCK_CHARS = {
         {'$', 0},
         {'*', 1},
-        {'@', 2},
+        {'%', 2},
 };
 
 static const char BLOCK_START = '{';

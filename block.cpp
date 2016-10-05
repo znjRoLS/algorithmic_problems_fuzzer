@@ -17,7 +17,9 @@ bool Block::GetNextInputBlock(
             blockComposition->AddBlock(block);
         }
         else {
-            return false;
+            //cout << "**** GetOneInputBlock(input, block, vars) - RETURNED FALSE" << endl;
+            //cout << "naaaah, just break" << endl;
+            break;
         }
     }
     return true;
@@ -27,6 +29,7 @@ bool Block::GetOneInputBlock(
         stringstream& input,
         unique_ptr<Block>& block,
         unordered_map<string,shared_ptr<Variable>>& vars) {
+    //cout << "GetOneInputBlock {" << endl;
     char c;
     stringstream token;
     stringstream blockInput;
@@ -38,6 +41,8 @@ bool Block::GetOneInputBlock(
 
     while(true) {
         if (!(input >> c)) {
+            //cout << "**** if (!(input >> c)) - RETURNED FALSE" << endl;
+            //cout << "GetOneInputBlock }" << endl;
             return false;
         }
 
@@ -46,6 +51,8 @@ bool Block::GetOneInputBlock(
                 if (!ParseInputBlock(token.str(), blockInput, blockType, block, vars)) {
 //                    cout << "Error opening file " << endl;
 //                    exit(255);
+                    //cout << "**** if (!ParseInputBlock(token.str(), blockInput, blockType, block, vars)) - RETURNED FALSE" << endl;
+                    //cout << "GetOneInputBlock }" << endl;
                     return false;
                 }
                 break;
@@ -67,6 +74,8 @@ bool Block::GetOneInputBlock(
                     if (!ParseInputBlock(token.str(), blockInput, blockType, block, vars)) {
 //                      cout << "Error opening file " << endl;
 //                      exit(255);
+                        //cout << "**** if (!ParseInputBlock(token.str(), blockInput, blockType, block, vars)) - RETURNED FALSE" << endl;
+                        //cout << "GetOneInputBlock }" << endl;
                         return false;
                     }
                     break;
@@ -83,6 +92,7 @@ bool Block::GetOneInputBlock(
             blockType = (BlockType)BLOCK_CHARS[c];
         }
     }
+    //cout << "GetOneInputBlock }" << endl;
     return true;
 }
 
@@ -92,6 +102,7 @@ bool Block::GetOneCaseBlock(
         unique_ptr<BlockComposition>& block,
         int& value,
         unordered_map<string,shared_ptr<Variable>>& vars) {
+    //cout << "GetOneCaseBlock {" << endl;
     char c;
     stringstream token;
     stringstream blockInput;
@@ -103,6 +114,8 @@ bool Block::GetOneCaseBlock(
 
     while(true) {
         if (!(input >> c)) {
+            //cout << "**** if (!(input >> c)) - RETURNED FALSE" << endl;
+            //cout << "GetOneCaseBlock }" << endl;
             return false;
         }
 
@@ -111,6 +124,8 @@ bool Block::GetOneCaseBlock(
                 if (!GetNextInputBlock(blockInput, block, vars)) {
 //                    cout << "Error opening file " << endl;
 //                    exit(255);
+                    //cout << "**** if (!GetNextInputBlock(blockInput, block, vars)) - RETURNED FALSE" << endl;
+                    //cout << "GetOneCaseBlock }" << endl;
                     return false;
                 }
                 value = stoi(token.str());
@@ -136,6 +151,7 @@ bool Block::GetOneCaseBlock(
             insideToken = true;
         }
     }
+    //cout << "GetOneCaseBlock }" << endl;
     return true;
 }
 
@@ -145,10 +161,13 @@ bool Block::ParseInputBlock(
         BlockType blockType,
         unique_ptr<Block>& block,
         unordered_map<string,shared_ptr<Variable>>& vars) {
+    //cout << "ParseInputBlock {" << endl;
 
     if (vars.find(token) == vars.end()) {
 //            cout << "Error parsing config" << endl;
 //            exit(255);
+        //cout << "**** if (vars.find(token) == vars.end()) - RETURNED FALSE" << endl;
+        //cout << "ParseInputBlock }" << endl;
         return false;
     }
 
@@ -156,6 +175,7 @@ bool Block::ParseInputBlock(
         unique_ptr<BlockSimple> blockSimple(new BlockSimple());
         blockSimple->SetEchoVar(vars[token]);
         block = static_unique_pointer_cast<Block,BlockSimple>(move(blockSimple));
+        //cout << "ParseInputBlock }" << endl;
 
         return true;
     }
@@ -164,9 +184,12 @@ bool Block::ParseInputBlock(
         unique_ptr<BlockComposition> blockComposition(new BlockComposition());
         blockComposition->SetRepeteVar(vars[token]);
         if (!Block::GetNextInputBlock(input, blockComposition, vars)) {
+            //cout << "**** if (!Block::GetNextInputBlock(input, blockComposition, vars)) - RETURNED FALSE" << endl;
+            //cout << "ParseInputBlock }" << endl;
             return false;
         }
         block = static_unique_pointer_cast<Block,BlockComposition>(move(blockComposition));
+        //cout << "ParseInputBlock }" << endl;
 
         return true;
     }
@@ -176,15 +199,25 @@ bool Block::ParseInputBlock(
         blockCondition->SetConditionVar(vars[token]);
         while(input) {
             int caseVal;
-            unique_ptr<BlockComposition> blockComposition;
+            unique_ptr<BlockComposition> blockComposition(new BlockComposition());
+            //TODO: daj bre ulepsaj ovo malo
+            shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
+            unityVar->SetValue(1);
+            blockComposition->SetRepeteVar(static_pointer_cast<Variable>(unityVar));
             if (!GetOneCaseBlock(input, blockComposition, caseVal, vars)) {
-                return false;
+                //cout << "**** if (!GetOneCaseBlock(input, blockComposition, caseVal, vars)) - RETURNED FALSE" << endl;
+                //cout << "naaah, just break instead" << endl;
+                break;
             }
             blockCondition->AddCase(caseVal, blockComposition);
         }
+        block = static_unique_pointer_cast<Block,BlockCondition>(move(blockCondition));
+        //cout << "ParseInputBlock }" << endl;
         return true;
     }
 
+    //cout << "**** Block::ParseInputBlock - RETURNED FALSE" << endl;
+    //cout << "ParseInputBlock }" << endl;
     return false;
 }
 
@@ -208,14 +241,16 @@ void BlockCondition::AddCase(int val, unique_ptr<BlockComposition>& blockComposi
     cases[val] = move(blockComposition);
 }
 
-
+//TODO: topological value generation ( x y, and we have x < y and y < 100 for instance)
 string BlockSimple::GetGeneratedText() {
+    //cout << "BlockSimple::GetGeneratedText " << endl;
     echoVar->GenerateValue();
 
     return echoVar->GetValue();
 }
 
 string BlockComposition::GetGeneratedText() {
+    //cout << "BlockComposition::GetGeneratedText " << endl;
 
     repeteVar->GenerateValue();
 
@@ -240,6 +275,7 @@ string BlockComposition::GetGeneratedText() {
 }
 
 string BlockCondition::GetGeneratedText() {
+    //cout << "BlockCondition::GetGeneratedText " << endl;
     conditionVar->GenerateValue();
 
     int conditionVal = stoi(conditionVar->GetValue());

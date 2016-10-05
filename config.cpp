@@ -136,6 +136,10 @@ void Config::ParseInput(string input) {
 
 void Config::ParseConstraints(string input) {
 
+	stringstream inputstream;
+	inputstream << input;
+
+
 }
 
 vector<string> Config::GetBinaries() {

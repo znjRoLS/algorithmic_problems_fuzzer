@@ -78,6 +78,36 @@ TEST(BlockRepeat, BlockTests) {
     EXPECT_LE(test, 100);
 }
 
+TEST(BlockCondition, BlockTests) {
+    unordered_map<string, shared_ptr<Variable>> vars;
+
+    shared_ptr<VariableIntConstant> var = make_shared<VariableIntConstant>();
+    var->SetValue(1);
+    vars["t"] = static_pointer_cast<Variable>(var);
+
+    shared_ptr<VariableIntConstant> varx = make_shared<VariableIntConstant>();
+    varx->SetValue(11);
+    vars["x"] = static_pointer_cast<Variable>(varx);
+
+    shared_ptr<VariableIntConstant> vary = make_shared<VariableIntConstant>();
+    vary->SetValue(22);
+    vars["y"] = static_pointer_cast<Variable>(vary);
+
+    unique_ptr<BlockComposition> rootBlock (new BlockComposition());
+    shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
+    unityVar->SetValue(1);
+    rootBlock->SetRepeteVar(static_pointer_cast<Variable>(unityVar));
+
+    stringstream input;
+    input << "%t%{@1@$x$@ @2@$y$@}";
+
+    Block::GetNextInputBlock(input, rootBlock, vars);
+
+    var->GenerateValue();
+    string temp = rootBlock->GetGeneratedText();
+    EXPECT_EQ(temp, "11");
+}
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
