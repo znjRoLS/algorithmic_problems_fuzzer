@@ -42,6 +42,32 @@ TEST(ConfigParseConstraints, ConfigTests) {
     }
 }
 
+TEST(ConfigParseConditional, ConfigTests) {
+    Config config;
+
+    TestConfig::ParseVar(config, "int:t,x,v");
+
+    //TODO: currently must be hardcoded like this, "$x$ $x$" generates two values, figure this out
+    TestConfig::ParseInput(config, "$t$-%t%{ @1@2@ @2@3@ } $x$ $v$");
+
+    TestConfig::ParseConstraints(config, "t>0\nt<=2\nx>5\nx<=6\nv<6\nv>=5");
+
+    bool foundIrregular = false;
+
+    for (int i = 0 ; i < 20; i ++) {
+
+        //cout << "output is " << config.GetInput() << endl;
+        string temp = config.GetInput();
+
+        size_t found = temp.find("1-3");
+        if (found != string::npos) foundIrregular = true;
+        found = temp.find("2-2");
+        if (found != string::npos) foundIrregular = true;
+    }
+
+    EXPECT_FALSE(foundIrregular);
+}
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

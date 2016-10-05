@@ -34,53 +34,68 @@ void Config::Parse(ifstream& config_file) {
 	unordered_map<string,string> conf;
 
 	while (1) {
-		config_file >> line;
+		if (!getline(config_file,line)) {
+            break;
+        }
 		
 		if (line == INPUT_START_LINE) {
 			stringstream input_config;
+            bool first = true;
 			while (1) {
-				config_file >> line;
+				getline(config_file,line);
 				if (line == INPUT_END_LINE) {
-					config_file >> line;
+					//config_file >> line;
 					Config::ParseInput(input_config.str());
 					break;
 				}
+                if (!first) input_config << endl;
+                first = false;
 				input_config << line;
 			}
+            continue;
 		}
 		if (line == VAR_START_LINE) {
 			stringstream input_config;
+            bool first = true;
 			while (1) {
-				config_file >> line;
+                getline(config_file, line);
 				if (line == VAR_END_LINE) {
-					config_file >> line;
+					//config_file >> line;
 					Config::ParseVar(input_config.str());
 					break;
 				}
+                if (!first) input_config << endl;
+                first = false;
 				input_config << line;
 			}
+            continue;
 		}
 
 		if (line == CONSTRAINTS_START_LINE) {
 			stringstream input_config;
+            bool first = true;
 			while (1) {
-				config_file >> line;
+				getline(config_file, line);
 				if (line == CONSTRAINTS_END_LINE) {
-					config_file >> line;
+					//config_file >> line;
 					Config::ParseConstraints(input_config.str());
 					break;
 				}
+                if (!first) input_config << endl;
+                first = false;
 				input_config << line;
 			}
+            continue;
 		}
 
 
-		if (config_file.eof()) break;
+		//if (config_file.eof()) break;
 
 		vector<string> tokens = split(line, '=');
 		if (tokens.size() != 2) {
-			cout << "Error while parsing config!" << endl;
-			exit(255);
+			//cout << "Error while parsing config! line: (skipping)" << line << endl;
+			//exit(255);
+            continue;
 		}
 
 		conf[tokens[0]] = tokens[1];
@@ -100,14 +115,20 @@ void Config::Parse(ifstream& config_file) {
 void Config::ParseVar(string input) {
 	//TODO add if already parsed this section.
 
+    //cout << "ParseVar" << endl;
+    //cout << input << endl;
     stringstream inputstream;
     inputstream << input;
 
     while (!inputstream.eof()) {
         string line;
-        inputstream >> line;
+        getline(inputstream,line);
 
         vector<string> tokens = split(line, ':');
+        if (tokens.size() != 2) {
+            //cout << "meeeh, just passing" << endl;
+            break;
+        }
         vector<string> varsVector = split(tokens[1], ',');
 
         //TODO@rols: check if exists
@@ -123,15 +144,15 @@ void Config::ParseVar(string input) {
 
 void Config::ParseInput(string input) {
 
+    //cout << "ParseInput" << endl;
+    //cout << input << endl;
 	//rootBlock = unique_ptr<BlockComposition>(new BlockComposition());
     shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
     unityVar->SetValue(1);
-    rootBlock->SetRepeteVar(static_pointer_cast<Variable>(unityVar));
+    rootBlock->SetRepeatVar(static_pointer_cast<Variable>(unityVar));
 
 	stringstream inputstream;
 	inputstream << input;
-
-    cout << input << " hehe" << endl;
 
 	if (!Block::GetNextInputBlock(inputstream, rootBlock, vars)) {
 		cout << "Error opening file " << endl;
@@ -141,6 +162,8 @@ void Config::ParseInput(string input) {
 
 void Config::ParseConstraints(string input) {
 
+    //cout << "ParseConstraints" << endl;
+    //cout << input << endl;
 	vector<string> lines = getLines(input);
 
     //TODO:: handle '=' properly (shouldn't be found now)
@@ -161,7 +184,7 @@ void Config::ParseConstraints(string input) {
         string firstParam = line.substr(0,found);
         string secondParam = line.substr(found + foundToken.size());
         if (vars.find(firstParam) == vars.end()) {
-            cout << "parse errorr!";
+            cout << "parse errorr! " << firstParam << endl;
             exit(255);
         }
         shared_ptr<Variable> firstVar = vars[firstParam];

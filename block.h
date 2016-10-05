@@ -17,7 +17,7 @@ using namespace std;
 //TODO: parse text between vars properly ( "$x1$,$x2$" )
 
 enum BlockType {
-    ECHO, REPETE, CONDITION
+    ECHO, REPEAT, CONDITION
 };
 
 //TODO: elegance, please
@@ -31,10 +31,12 @@ static const char BLOCK_START = '{';
 static const char BLOCK_END = '}';
 static const char CONDITION_DELIMITER = '@';
 
+
 class BlockComposition;
 
 class Block {
 public:
+    virtual BlockType GetType() = 0;
 
     virtual string GetGeneratedText() = 0;
 
@@ -48,6 +50,7 @@ public:
     static bool GetOneInputBlock(
             stringstream& input,
             unique_ptr<Block>& block,
+            stringstream& textFill,
             unordered_map<string,shared_ptr<Variable>>& vars
     );
 
@@ -65,31 +68,45 @@ public:
             unique_ptr<Block>& block,
             unordered_map<string,shared_ptr<Variable>>& vars
     );
+
+    virtual void GenerateSelfVar() = 0;
 };
 
 class BlockSimple: public Block {
 public:
+    BlockType GetType() override;
     string GetGeneratedText() override;
+    void GenerateSelfVar() override;
     void SetEchoVar(shared_ptr<Variable> var);
+    shared_ptr<Variable> GetEchoVar();
 private:
     shared_ptr<Variable> echoVar;
 };
 
 class BlockComposition: public Block {
 public:
+    BlockType GetType() override;
     string GetGeneratedText() override;
+    void VariablesGeneration();
+    void GenerateSelfVar() override;
     void AddBlock(unique_ptr<Block>& block);
-    void SetRepeteVar(shared_ptr<Variable> var);
+    void AddTextFill(string textFill);
+    void SetRepeatVar(shared_ptr<Variable> var);
+    shared_ptr<Variable> GetRepeatVar();
 private:
     //TODO: only int variables?
-    shared_ptr<Variable> repeteVar;
+    shared_ptr<Variable> repeatVar;
     vector<unique_ptr<Block> >  composition;
+    vector<string> textFills;
 };
 
 class BlockCondition: public Block {
 public:
+    BlockType GetType() override;
     string GetGeneratedText() override;
+    void GenerateSelfVar() override;
     void SetConditionVar(shared_ptr<Variable> var);
+    shared_ptr<Variable> GetConditionVar();
     void AddCase(int val, unique_ptr<BlockComposition>& blockComposition);
 private:
     //TODO: uskladi se, uniqeu, shared...

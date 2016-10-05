@@ -1,4 +1,5 @@
 #include "common.h"
+#include "block.h"
 
 #include <sstream>
 
@@ -24,13 +25,19 @@ vector<string> getLines(string input) {
     vector<string> lines;
 
     string line;
-    while(true) {
-        inputstream >> line;
-        if (!inputstream)
-            break;
-
+    while( getline( inputstream, line ))  {
         lines.push_back(line);
     }
 
     return lines;
 }
+
+template<typename TO, typename FROM>
+unique_ptr<TO> static_unique_pointer_cast (unique_ptr<FROM>&& old){
+    return unique_ptr<TO>{static_cast<TO*>(old.release())};
+    //conversion: unique_ptr<FROM>->FROM*->TO*->unique_ptr<TO>
+}
+
+template unique_ptr<Block> static_unique_pointer_cast<Block, BlockSimple> (unique_ptr<BlockSimple>&&);
+template unique_ptr<Block> static_unique_pointer_cast<Block, BlockComposition> (unique_ptr<BlockComposition>&&);
+template unique_ptr<Block> static_unique_pointer_cast<Block, BlockCondition> (unique_ptr<BlockCondition>&&);
