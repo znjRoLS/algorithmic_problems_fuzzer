@@ -68,6 +68,55 @@ TEST(ConfigParseConditional, ConfigTests) {
     EXPECT_FALSE(foundIrregular);
 }
 
+TEST(ConfigParseComplicated, ConfigTests) {
+    Config config;
+
+    TestConfig::ParseVar(config, "int:t,x,x1,x2,y,y1,y2,z,z1,z2,q,cmd");
+
+    //TODO: currently must be hardcoded like this, "$x$ $x$" generates two values, figure this out
+    TestConfig::ParseInput(config, "$t$\n"
+            "*t*{$x$ $y$ $z$ $q$\n"
+            "*q*{%cmd%{\n"
+            "    @3@3 $x1$ $y1$ $z1$ $x2$ $y2$ $z2$@\n"
+            "    @0@0 $x1$ $x2$@\n"
+            "    @1@1 $y1$ $y2$@\n"
+            "    @2@2 $z1$ $z2$@\n"
+            "    }\n"
+            "}\n"
+            "}");
+
+    TestConfig::ParseConstraints(config, "t>0\n"
+            "t<=10\n"
+            "x>0\n"
+            "x<100\n"
+            "y>0\n"
+            "y<100\n"
+            "z>0\n"
+            "z<100\n"
+            "q>0\n"
+            "q<5\n"
+            "cmd>=0\n"
+            "cmd<=3\n"
+            "x1>=0\n"
+            "x1<x\n"
+            "x2>=x1\n"
+            "x2<x\n"
+            "y1>=0\n"
+            "y1<y\n"
+            "y2>=y1\n"
+            "y2<y\n"
+            "z1>=0\n"
+            "z1<z\n"
+            "z2>=z1\n"
+            "z2<z");
+
+
+    for (int i = 0 ; i < 20; i ++) {
+
+        cout << "output is " << config.GetInput() << endl;
+    }
+}
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

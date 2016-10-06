@@ -18,212 +18,238 @@ Config::Config():
 
 void Config::OpenFile(char *filename) {
 
-    ifstream config_file(filename);
+  ifstream config_file(filename);
 
-    if (!config_file.is_open()) {
-        cout << "Error opening file " << filename << endl;
-        exit(255);
-    }
+  if (!config_file.is_open()) {
+    cout << "Error opening file " << filename << endl;
+    exit(255);
+  }
 
-    Config::Parse(config_file);
+  Config::Parse(config_file);
 }
 
 void Config::Parse(ifstream& config_file) {
-	string line;
+  string line;
 
-	unordered_map<string,string> conf;
+  while (1) {
+    if (!getline(config_file,line)) {
+      break;
+    }
 
-	while (1) {
-		if (!getline(config_file,line)) {
-            break;
+    if (line == END_LINE) {
+      break;
+    }
+
+    if (line == INPUT_START_LINE) {
+      stringstream input_config;
+      bool first = true;
+      while (1) {
+        getline(config_file,line);
+        if (line == INPUT_END_LINE) {
+          //config_file >> line;
+          Config::ParseInput(input_config.str());
+          break;
         }
-		
-		if (line == INPUT_START_LINE) {
-			stringstream input_config;
-            bool first = true;
-			while (1) {
-				getline(config_file,line);
-				if (line == INPUT_END_LINE) {
-					//config_file >> line;
-					Config::ParseInput(input_config.str());
-					break;
-				}
-                if (!first) input_config << endl;
-                first = false;
-				input_config << line;
-			}
-            continue;
-		}
-		if (line == VAR_START_LINE) {
-			stringstream input_config;
-            bool first = true;
-			while (1) {
-                getline(config_file, line);
-				if (line == VAR_END_LINE) {
-					//config_file >> line;
-					Config::ParseVar(input_config.str());
-					break;
-				}
-                if (!first) input_config << endl;
-                first = false;
-				input_config << line;
-			}
-            continue;
-		}
+        if (!first) input_config << endl;
+        first = false;
+        input_config << line;
+      }
+      continue;
+    }
+    if (line == VAR_START_LINE) {
+      stringstream input_config;
+      bool first = true;
+      while (1) {
+        getline(config_file, line);
+        if (line == VAR_END_LINE) {
+          //config_file >> line;
+          Config::ParseVar(input_config.str());
+          break;
+        }
+        if (!first) input_config << endl;
+        first = false;
+        input_config << line;
+      }
+      continue;
+    }
 
-		if (line == CONSTRAINTS_START_LINE) {
-			stringstream input_config;
-            bool first = true;
-			while (1) {
-				getline(config_file, line);
-				if (line == CONSTRAINTS_END_LINE) {
-					//config_file >> line;
-					Config::ParseConstraints(input_config.str());
-					break;
-				}
-                if (!first) input_config << endl;
-                first = false;
-				input_config << line;
-			}
-            continue;
-		}
+    if (line == CONSTRAINTS_START_LINE) {
+      stringstream input_config;
+      bool first = true;
+      while (1) {
+        getline(config_file, line);
+        if (line == CONSTRAINTS_END_LINE) {
+          //config_file >> line;
+          Config::ParseConstraints(input_config.str());
+          break;
+        }
+        if (!first) input_config << endl;
+        first = false;
+        input_config << line;
+      }
+      continue;
+    }
 
 
-		//if (config_file.eof()) break;
+    //if (config_file.eof()) break;
 
-		vector<string> tokens = split(line, '=');
-		if (tokens.size() != 2) {
-			//cout << "Error while parsing config! line: (skipping)" << line << endl;
-			//exit(255);
-            continue;
-		}
+    vector<string> tokens = split(line, '=');
+    if (tokens.size() != 2) {
+      //cout << "Error while parsing config! line: (skipping)" << line << endl;
+      //exit(255);
+      continue;
+    }
 
-		conf[tokens[0]] = tokens[1];
-	}
+    confParams[tokens[0]] = tokens[1];
+  }
 
-	string bin_prefix = conf["binary_prefix"];
-	string binaries_string = conf["binaries"];
+  string bin_prefix = confParams["binary_prefix"];
+  string binaries_string = confParams["binaries"];
 
-	vector<string> binaries_vector = split(binaries_string, ',');
-	
-	for(string& binary: binaries_vector) {
-		binaries.push_back(bin_prefix + binary);
-	}
+  vector<string> binaries_vector = split(binaries_string, ',');
+
+  for(string& binary: binaries_vector) {
+    binaries.push_back(bin_prefix + binary);
+  }
 
 }
 
 void Config::ParseVar(string input) {
-	//TODO add if already parsed this section.
+  //TODO add if already parsed this section.
 
-    //cout << "ParseVar" << endl;
-    //cout << input << endl;
-    stringstream inputstream;
-    inputstream << input;
+  //cout << "ParseVar" << endl;
+  //cout << input << endl;
+  stringstream inputstream;
+  inputstream << input;
 
-    while (!inputstream.eof()) {
-        string line;
-        getline(inputstream,line);
+  while (!inputstream.eof()) {
+    string line;
+    getline(inputstream,line);
 
-        vector<string> tokens = split(line, ':');
-        if (tokens.size() != 2) {
-            //cout << "meeeh, just passing" << endl;
-            break;
-        }
-        vector<string> varsVector = split(tokens[1], ',');
-
-        //TODO@rols: check if exists
-        if (tokens[0] == "int") {
-            for(string &token: varsVector) {
-                vars[token] =  unique_ptr<Variable>(new VariableInt());
-            }
-        }
+    vector<string> tokens = split(line, ':');
+    if (tokens.size() != 2) {
+      //cout << "meeeh, just passing" << endl;
+      break;
     }
+    vector<string> varsVector = split(tokens[1], ',');
+
+    //TODO@rols: check if exists
+    if (tokens[0] == "int") {
+      for(string &token: varsVector) {
+        vars[token] =  unique_ptr<Variable>(new VariableInt());
+        vars[token]->SetName(token);
+      }
+    }
+  }
 }
 
 
 
 void Config::ParseInput(string input) {
 
-    //cout << "ParseInput" << endl;
-    //cout << input << endl;
-	//rootBlock = unique_ptr<BlockComposition>(new BlockComposition());
-    shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
-    unityVar->SetValue(1);
-    rootBlock->SetRepeatVar(static_pointer_cast<Variable>(unityVar));
+  //cout << "ParseInput" << endl;
+  //cout << input << endl;
+  //rootBlock = unique_ptr<BlockComposition>(new BlockComposition());
+  shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
+  unityVar->SetValue(1);
+  rootBlock->SetRepeatVar(static_pointer_cast<Variable>(unityVar));
 
-	stringstream inputstream;
-	inputstream << input;
+  stringstream inputstream;
+  inputstream << input;
 
-	if (!Block::GetNextInputBlock(inputstream, rootBlock, vars)) {
-		cout << "Error opening file " << endl;
-		exit(255);
-	}
+  if (!Block::GetNextInputBlock(inputstream, rootBlock, vars)) {
+    cout << "Error opening file " << endl;
+    exit(255);
+  }
 }
 
 void Config::ParseConstraints(string input) {
 
-    //cout << "ParseConstraints" << endl;
-    //cout << input << endl;
-	vector<string> lines = getLines(input);
+  //cout << "ParseConstraints" << endl;
+  //cout << input << endl;
+  vector<string> lines = getLines(input);
 
-    //TODO:: handle '=' properly (shouldn't be found now)
-    static const vector<string> operatorTokens = {"<=", ">=", "=", "<", ">"};
+  //TODO:: handle '=' properly (shouldn't be found now)
+  static const vector<string> operatorTokens = {"<=", ">=", "=", "<", ">"};
 
-    for(string& line : lines) {
-        size_t found;
-        string foundToken;
+  for(string& line : lines) {
+    size_t found;
+    string foundToken;
 
-        for (auto& operatorToken : operatorTokens) {
-            found = line.find(operatorToken);
-            if (found!=std::string::npos) {
-                foundToken = operatorToken;
-                break;
-            }
-        }
-
-        string firstParam = line.substr(0,found);
-        string secondParam = line.substr(found + foundToken.size());
-        if (vars.find(firstParam) == vars.end()) {
-            cout << "parse errorr! " << firstParam << endl;
-            exit(255);
-        }
-        shared_ptr<Variable> firstVar = vars[firstParam];
-
-
-        if (vars.find(secondParam) != vars.end()) {
-
-            firstVar->SetUpperLimit(vars[secondParam]);
-            continue;
-        }
-
-        shared_ptr<VariableInt> tryFirstCast = dynamic_pointer_cast<VariableInt>(firstVar);
-        if (!tryFirstCast) {
-            cout << "var not an int!";
-            exit(255);
-        }
-        //TODO: really? just int?
-        int second = stoi(secondParam);
-
-        if (foundToken == "<=") {
-            tryFirstCast->SetUpperLimit(second);
-        }
-        if (foundToken == ">=") {
-            tryFirstCast->SetLowerLimit(second);
-        }
-        if (foundToken == "<") {
-            tryFirstCast->SetUpperLimit(--second);
-        }
-        if (foundToken == ">") {
-            tryFirstCast->SetLowerLimit(++second);
-        }
+    for (auto& operatorToken : operatorTokens) {
+      found = line.find(operatorToken);
+      if (found!=std::string::npos) {
+        foundToken = operatorToken;
+        break;
+      }
     }
+
+    string firstParam = line.substr(0,found);
+    string secondParam = line.substr(found + foundToken.size());
+    if (vars.find(firstParam) == vars.end()) {
+      cout << "parse errorr! " << firstParam << endl;
+      exit(255);
+    }
+    shared_ptr<Variable> firstVar = vars[firstParam];
+
+    if (vars.find(secondParam) != vars.end()) {
+
+      if (foundToken == "<=") {
+        firstVar->SetUpperLimit(vars[secondParam]);
+        firstVar->SetUpperLimitInclusive(true);
+      }
+      if (foundToken == ">=") {
+        firstVar->SetLowerLimit(vars[secondParam]);
+        firstVar->SetLowerLimitInclusive(true);
+      }
+      if (foundToken == "<") {
+        firstVar->SetUpperLimit(vars[secondParam]);
+        firstVar->SetUpperLimitInclusive(false);
+      }
+      if (foundToken == ">") {
+        firstVar->SetLowerLimit(vars[secondParam]);
+        firstVar->SetLowerLimitInclusive(false);
+      }
+      continue;
+    }
+
+    shared_ptr<VariableInt> tryFirstCast = dynamic_pointer_cast<VariableInt>(firstVar);
+    if (!tryFirstCast) {
+      cout << "var not an int!";
+      exit(255);
+    }
+    //TODO: really? just int?
+    int second = stoi(secondParam);
+
+    if (foundToken == "<=") {
+      tryFirstCast->SetUpperLimit(second);
+      tryFirstCast->SetUpperLimitInclusive(true);
+    }
+    if (foundToken == ">=") {
+      tryFirstCast->SetLowerLimit(second);
+      tryFirstCast->SetLowerLimitInclusive(true);
+    }
+    if (foundToken == "<") {
+      tryFirstCast->SetUpperLimit(second);
+      tryFirstCast->SetUpperLimitInclusive(false);
+    }
+    if (foundToken == ">") {
+      tryFirstCast->SetLowerLimit(second);
+      tryFirstCast->SetLowerLimitInclusive(false);
+    }
+  }
 
 }
 
 vector<string> Config::GetBinaries() {
-	return binaries;
+  return binaries;
 }
 
 string Config::GetInput() {
-    return rootBlock->GetGeneratedText();
+  return rootBlock->GetGeneratedText();
+}
+
+string Config::GetParam(string name, string defaultVal) {
+  if (confParams.find(name) == confParams.end()) return defaultVal;
+  return confParams[name];
 }

@@ -171,7 +171,7 @@ TEST(BlockSimpleMoreSame, BlockTests) {
     unordered_map<string, shared_ptr<Variable>> vars;
 
     shared_ptr<VariableInt> var = make_shared<VariableInt>();
-    var->SetUpperLimit(10);
+    var->SetLowerLimit(10);
     var->SetUpperLimit(100);
     vars["x"] = static_pointer_cast<Variable>(var);
 
@@ -201,7 +201,7 @@ TEST(BlockRepeatDifferent, BlockTests) {
     unordered_map<string, shared_ptr<Variable>> vars;
 
     shared_ptr<VariableInt> var = make_shared<VariableInt>();
-    var->SetUpperLimit(10);
+    var->SetLowerLimit(10);
     var->SetUpperLimit(100);
     vars["x"] = static_pointer_cast<Variable>(var);
 
@@ -233,6 +233,50 @@ TEST(BlockRepeatDifferent, BlockTests) {
     }
 
     EXPECT_FALSE(same);
+}
+
+TEST(BlockVarLimits, BlockTests) {
+    unordered_map<string, shared_ptr<Variable>> vars;
+
+    shared_ptr<VariableInt> var = make_shared<VariableInt>();
+    var->SetLowerLimit(50);
+    var->SetUpperLimit(100);
+    vars["x"] = static_pointer_cast<Variable>(var);
+
+
+    shared_ptr<VariableInt> var1 = make_shared<VariableInt>();
+    var1->SetLowerLimit(10);
+    var1->SetUpperLimit(var);
+    vars["x1"] = static_pointer_cast<Variable>(var1);
+
+    shared_ptr<VariableInt> var2 = make_shared<VariableInt>();
+    var2->SetLowerLimit(var);
+    var2->SetUpperLimit(100);
+    vars["x2"] = static_pointer_cast<Variable>(var2);
+
+    unique_ptr<BlockComposition> rootBlock (new BlockComposition());
+    shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
+    unityVar->SetValue(1);
+    rootBlock->SetRepeatVar(static_pointer_cast<Variable>(unityVar));
+
+    stringstream input;
+    input << "$x$ $x1$ $x2$";
+
+    Block::GetNextInputBlock(input, rootBlock, vars);
+
+    for (int i = 0 ; i < 3 ; i ++) {
+        string temp = rootBlock->GetGeneratedText();
+
+        //cout << "temp " << temp << endl;
+
+        stringstream tempstream;
+        tempstream << temp;
+        int temp1, temp2, temp3;
+        tempstream >> temp1 >> temp2 >> temp3;
+
+        EXPECT_GE(temp1, temp2);
+        EXPECT_LE(temp1, temp3);
+    }
 }
 
 int main(int argc, char **argv) {

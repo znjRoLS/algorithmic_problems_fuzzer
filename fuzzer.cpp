@@ -23,8 +23,12 @@ int main(int argc, char **argv) {
 	Config config;
 	config.OpenFile(argv[1]);
 
-	srand(time(0));
-	for(int iter_num = 0; ; iter_num ++) {
+	//srand(time(0));
+
+    int max_interations = stoi(config.GetParam("max_iterations", "1000"));
+    bool stop_on_error = config.GetParam("stop_on_error", "1") == "1";
+
+	for(int iter_num = 0; iter_num < max_interations; iter_num ++) {
 		
 		if (iter_num % 1000 == 0) cout << "Iteration " << iter_num << endl;
 
@@ -55,7 +59,9 @@ int main(int argc, char **argv) {
 					cout << first_output << endl;
 					cout << "Output 2: " << endl;
 					cout << output << endl;
-					return 0;
+
+                    if (stop_on_error)
+					    return 0;
 				}
 			}
 

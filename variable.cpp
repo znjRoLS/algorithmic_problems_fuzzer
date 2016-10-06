@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <memory>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -33,6 +34,17 @@ inline void SetRandomVar(double x_min, double x_max, double &x) {
 }
 
 
+Variable::Variable():
+    isUpperLimitVar(false), isLowerLimitVar(false), isUpperLimitInclusive(true), isLowerLimitInclusive(true) {}
+
+void Variable::SetName(string n) {
+    name = n;
+}
+
+string Variable::GetName() {
+    return name;
+}
+
 void Variable::SetUpperLimit(shared_ptr<Variable> var) {
     upperVar = var;
     isUpperLimitVar = true;
@@ -43,13 +55,13 @@ void Variable::SetLowerLimit(shared_ptr<Variable> var) {
     isLowerLimitVar = true;
 }
 
-/*void Variable::SetUpperLimitInclusive(bool val) {
+void Variable::SetUpperLimitInclusive(bool val) {
     isUpperLimitInclusive = val;
 }
 
 void Variable::SetLowerLimitInclusive(bool val) {
-    isUpperLimitInclusive = val;
-}*/
+    isLowerLimitInclusive = val;
+}
 
 void VariableInt::GenerateValue() {
     if (isUpperLimitVar) {
@@ -59,12 +71,12 @@ void VariableInt::GenerateValue() {
         lowerInt = stoi(lowerVar->GetValue());
     }
 
-    /*int lowerLimit = lowerInt;
+    int lowerLimit = lowerInt;
     if (!isLowerLimitInclusive) lowerLimit++;
     int upperLimit = upperInt;
-    if (!isUpperLimitInclusive) upperLimit--;*/
+    if (!isUpperLimitInclusive) upperLimit--;
 
-    SetRandomVar(lowerInt, upperInt, value);
+    SetRandomVar(lowerLimit, upperLimit, value);
 }
 
 string VariableInt::GetValue() {

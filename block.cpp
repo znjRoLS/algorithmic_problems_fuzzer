@@ -138,7 +138,7 @@ bool Block::GetOneCaseBlock(
     BlockType blockType;
 
     while(true) {
-        if (!(input >> c)) {
+        if (!(input.get(c))) {
             //cout << "**** if (!(input >> c)) - RETURNED FALSE" << endl;
             //cout << "GetOneCaseBlock }" << endl;
             return false;

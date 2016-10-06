@@ -12,66 +12,72 @@ using namespace std;
 
 class Variable {
 public:
-    void SetUpperLimit(shared_ptr<Variable> var);
-    void SetLowerLimit(shared_ptr<Variable> var);
-    /*void SetUpperLimitInclusive(bool);
-    void SetLowerLimitInclusive(bool);*/
-    virtual string GetValue() = 0;
-    virtual void GenerateValue() = 0;
-protected:
-    bool isUpperLimitVar = false;
-    bool isLowerLimitVar = false;
-    bool isUpperLimitSet = false;
-    bool isLowerLimitSet = false;
-    /*bool isUpperLimitInclusive = false;
-    bool isLowerLimitInclusive = false;*/
+  Variable();
+  void SetUpperLimit(shared_ptr<Variable> var);
+  void SetLowerLimit(shared_ptr<Variable> var);
+  void SetUpperLimitInclusive(bool);
+  void SetLowerLimitInclusive(bool);
+  virtual string GetValue() = 0;
+  virtual void GenerateValue() = 0;
+  void SetName(string);
+  string GetName();
 
-    shared_ptr<Variable> lowerVar;
-    shared_ptr<Variable> upperVar;
+protected:
+  bool isUpperLimitVar;
+  bool isLowerLimitVar;
+  bool isUpperLimitSet;
+  bool isLowerLimitSet;
+  bool isUpperLimitInclusive = false;
+  bool isLowerLimitInclusive = false;
+
+  shared_ptr<Variable> lowerVar;
+  shared_ptr<Variable> upperVar;
+private:
+  string name;
 };
 
 class VariableIntConstant: public Variable {
 public:
-    string GetValue() override;
-    void GenerateValue() override;
+  string GetValue() override;
+  void GenerateValue() override;
 
-    void SetValue(int val);
+  void SetValue(int val);
 
 private:
-    int value;
+  int value;
 };
 
 class VariableInt: public Variable {
 public:
-    string GetValue() override;
-    void GenerateValue() override;
+  string GetValue() override;
+  void GenerateValue() override;
 
-    using Variable::SetLowerLimit;
-    using Variable::SetUpperLimit;
-    void SetUpperLimit(int val);
-    void SetLowerLimit(int val);
+  using Variable::SetLowerLimit;
+  using Variable::SetUpperLimit;
+  void SetUpperLimit(int val);
+  void SetLowerLimit(int val);
 
 private:
-    int upperInt;
-    int lowerInt;
-    int value;
+  int upperInt;
+  int lowerInt;
+  int value;
 };
 
 
 class VariableDouble: public Variable {
 public:
-    string GetValue() override;
-    void GenerateValue() override;
+  string GetValue() override;
+  void GenerateValue() override;
 
-    using Variable::SetLowerLimit;
-    using Variable::SetUpperLimit;
-    void SetUpperLimit(double val);
-    void SetLowerLimit(double val);
+  using Variable::SetLowerLimit;
+  using Variable::SetUpperLimit;
+  void SetUpperLimit(double val);
+  void SetLowerLimit(double val);
 
 private:
-    double upperInt;
-    double lowerInt;
-    double value;
+  double upperInt;
+  double lowerInt;
+  double value;
 };
 
 
