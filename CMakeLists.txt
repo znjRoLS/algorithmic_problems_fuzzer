@@ -14,6 +14,7 @@ project (fuzzer)
 add_executable(fuzzer fuzzer.cpp binary_runner.cpp common.cpp config.cpp block.cpp block.h variable.cpp variable.h)
 #add_executable(test_bin test_bin.cpp)
 
+if (false)
 include_directories(googletest/googletest/include)
 add_subdirectory (googletest/googletest)
 enable_testing()
@@ -21,4 +22,4 @@ enable_testing()
 cxx_test(variable_test gtest_main variable.cpp)
 cxx_test(block_test gtest_main block.cpp variable.cpp common.cpp)
 cxx_test(config_test gtest_main config.cpp block.cpp variable.cpp common.cpp)
-
+endif()
