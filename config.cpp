@@ -169,7 +169,6 @@ void Config::ParseConstraints(string input) {
   //cout << input << endl;
   vector<string> lines = getLines(input);
 
-  //TODO:: handle '=' properly (shouldn't be found now)
   static const vector<string> operatorTokens = {"<=", ">=", "=", "<", ">"};
 
   for(string& line : lines) {
@@ -209,6 +208,12 @@ void Config::ParseConstraints(string input) {
       if (foundToken == ">") {
         firstVar->SetLowerLimit(vars[secondParam]);
         firstVar->SetLowerLimitInclusive(false);
+      }
+      if (foundToken == "=") {
+        firstVar->SetUpperLimit(vars[secondParam]);
+        firstVar->SetUpperLimitInclusive(true);
+        firstVar->SetLowerLimit(vars[secondParam]);
+        firstVar->SetLowerLimitInclusive(true);
       }
       continue;
     }

@@ -27,15 +27,17 @@ int main(int argc, char **argv) {
 
     int max_interations = stoi(config.GetParam("max_iterations", "1000"));
     bool stop_on_error = config.GetParam("stop_on_error", "1") == "1";
+	bool write_input = config.GetParam("write_input", "0") == "1";
+	bool write_output = config.GetParam("write_output", "0") == "1";
 
 	for(int iter_num = 0; iter_num < max_interations; iter_num ++) {
-		
-		if (iter_num % 1000 == 0) cout << "Iteration " << iter_num << endl;
 
 		string program_input = config.GetInput();
 
+
 		bool first_bin = true;
 		string first_output;
+		string output;
 
 		for (string& binary_path: config.GetBinaries()) {
 
@@ -44,7 +46,7 @@ int main(int argc, char **argv) {
 			//cout << "Running: " << binary_path << endl;
 			//cout <<	"With input: " << program_input.str() << endl;
 
-			string output = prog.Run(program_input);
+			output = prog.Run(program_input);
 			
 			if (first_bin) {
 				first_output = output;
@@ -65,11 +67,22 @@ int main(int argc, char **argv) {
 				}
 			}
 
-
 			//cout << "Output: " << output << endl;
 		}
 
-		
+		if (iter_num % 1000 == 0) {
+			cout << "Iteration " << iter_num << endl;
+			if (write_input) {
+				cout << "Input: " << endl;
+				cout << program_input << endl;
+			}
+			if (write_output) {
+				cout << "Output 1: " << endl;
+				cout << first_output << endl;
+				cout << "Output 2: " << endl;
+				cout << output << endl;
+			}
+		}
 
 	}
 	return 0;
