@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -57,7 +58,7 @@ public:
   void SetUpperLimit(int val);
   void SetLowerLimit(int val);
 
-private:
+protected:
   int upperInt;
   int lowerInt;
   int value;
@@ -74,10 +75,21 @@ public:
   void SetUpperLimit(double val);
   void SetLowerLimit(double val);
 
-private:
+protected:
   double upperInt;
   double lowerInt;
   double value;
+};
+
+
+class VariablePermutation: public VariableInt {
+public:
+  string GetValue() override;
+  void GenerateValue() override;
+
+private:
+  vector<int> permutation;
+
 };
 
 

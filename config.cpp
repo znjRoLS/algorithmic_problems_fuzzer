@@ -134,9 +134,15 @@ void Config::ParseVar(string input) {
     vector<string> varsVector = split(tokens[1], ',');
 
     //TODO@rols: check if exists
+    //TODO@rols: hashmap for types?
     if (tokens[0] == "int") {
       for(string &token: varsVector) {
         vars[token] =  unique_ptr<Variable>(new VariableInt());
+        vars[token]->SetName(token);
+      }
+    } else if (tokens[0] == "permutation") {
+      for(string &token: varsVector) {
+        vars[token] = unique_ptr<Variable>(new VariablePermutation());
         vars[token]->SetName(token);
       }
     }

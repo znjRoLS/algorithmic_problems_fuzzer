@@ -9,6 +9,9 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <random>
+#include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -31,6 +34,16 @@ inline void SetRandomVar(double x_min, double x_max, double &x) {
   SetSeedIfNeeded();
   x = (double)rand() / RAND_MAX;
   x = x_min + x * (x_max - x_min);
+}
+
+inline void SetRandomPermutation(int x_min, int x_max, vector<int>& perm) {
+  SetSeedIfNeeded();
+  perm.clear();
+  for(int i = x_min;i <= x_max; i ++) {
+    perm.push_back(i);
+  }
+  auto engine = std::default_random_engine{};
+  std::shuffle(std::begin(perm), std::end(perm), engine);
 }
 
 
@@ -131,3 +144,30 @@ void VariableIntConstant::SetValue(int val) {
 string VariableIntConstant::GetValue() {
   return to_string(value);
 };
+
+
+void VariablePermutation::GenerateValue() {
+  if (isUpperLimitVar) {
+    upperInt = stoi(upperVar->GetValue());
+  }
+  if (isLowerLimitVar) {
+    lowerInt = stoi(lowerVar->GetValue());
+  }
+
+  int lowerLimit = lowerInt;
+  if (!isLowerLimitInclusive) lowerLimit++;
+  int upperLimit = upperInt;
+  if (!isUpperLimitInclusive) upperLimit--;
+
+  SetRandomPermutation(lowerLimit, upperLimit, permutation);
+}
+
+string VariablePermutation::GetValue() {
+  stringstream ss;
+  for(int i = 0; i < permutation.size(); i ++) {
+    if (i!= 0) ss << " ";
+    ss << permutation[i];
+  }
+
+  return ss.str();
+}
