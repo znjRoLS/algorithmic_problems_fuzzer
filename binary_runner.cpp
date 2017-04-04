@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <sstream>
+#include <sys/wait.h>
 
 #include "binary_runner.h"
 
