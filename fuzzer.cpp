@@ -29,15 +29,26 @@ int main(int argc, char **argv) {
     bool stop_on_error = config.GetParam("stop_on_error", "1") == "1";
 	bool write_input = config.GetParam("write_input", "0") == "1";
 	bool write_output = config.GetParam("write_output", "0") == "1";
+	string generator_binary = config.GetParam("generator_binary", "");
+	bool generate_binary = generator_binary != "";
 
 	for(int iter_num = 0; iter_num < max_interations; iter_num ++) {
 
-		string program_input = config.GetInput();
+		string program_input;
+
+		if (generate_binary) {
+			Binary prog(config.GetParam("binary_prefix", "") + generator_binary);
+			program_input = prog.Run("");
+		} else {
+			program_input = config.GetInput();
+		}
 
 
 		bool first_bin = true;
 		string first_output;
 		string output;
+
+
 
 		for (string& binary_path: config.GetBinaries()) {
 
