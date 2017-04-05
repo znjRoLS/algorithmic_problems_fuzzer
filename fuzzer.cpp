@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
 	bool write_output = config.GetParam("write_output", "0") == "1";
 	string generator_binary = config.GetParam("generator_binary", "");
 	bool generate_binary = generator_binary != "";
+    int iterations_step = stoi(config.GetParam("iterations_step", "1000"));
 
 	for(int iter_num = 0; iter_num < max_interations; iter_num ++) {
 
@@ -81,7 +82,7 @@ int main(int argc, char **argv) {
 			//cout << "Output: " << output << endl;
 		}
 
-		if (iter_num % 1000 == 0) {
+		if (iter_num % iterations_step == 0) {
 			cout << "Iteration " << iter_num << endl;
 			if (write_input) {
 				cout << "Input: " << endl;
