@@ -130,9 +130,28 @@ string Binary::Run(string input) {
 //
 //	close(pipeto[1]);
 
+//    int status;
+//    sleep(timelimit);
+//    pid_t return_pid= waitpid(nPid, &status, WNOHANG);
+//    if (return_pid == -1) {
+//        perror( "error while reading status of child" );
+//        exit(255);
+//    } else if (return_pid == 0){
+//        //still runnning! kill it !
+//        kill(nPid, SIGKILL);
+//        return "***** TLE";
+//
+//
+//    } else if (return_pid == nPid) {
+//        //child is finished.
+//        string output = GetOutput(pipefrom[0]);
+//        return output;
+//    }
+
+
 	string output = GetOutput(pipefrom[0]);
 
-	int status;
+    int status;
 	waitpid(nPid, &status, 0);
 
 	return output;

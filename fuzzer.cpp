@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
 	string generator_binary = config.GetParam("generator_binary", "");
 	bool generate_binary = generator_binary != "";
     int iterations_step = stoi(config.GetParam("iterations_step", "1000"));
+    int time_limit = stoi(config.GetParam("time_limit", "10"));
 
 	for(int iter_num = 0; iter_num < max_interations; iter_num ++) {
 
@@ -52,6 +53,14 @@ int main(int argc, char **argv) {
 
 
 		for (string& binary_path: config.GetBinaries()) {
+
+            if (iter_num % iterations_step == 0) {
+                cout << "Iteration " << iter_num << endl;
+                if (write_input) {
+                    cout << "Input: " << endl;
+                    cout << program_input << endl;
+                }
+            }
 
 			Binary prog(binary_path);
 
@@ -83,11 +92,6 @@ int main(int argc, char **argv) {
 		}
 
 		if (iter_num % iterations_step == 0) {
-			cout << "Iteration " << iter_num << endl;
-			if (write_input) {
-				cout << "Input: " << endl;
-				cout << program_input << endl;
-			}
 			if (write_output) {
 				cout << "Output 1: " << endl;
 				cout << first_output << endl;

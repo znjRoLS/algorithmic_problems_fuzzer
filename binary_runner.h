@@ -7,6 +7,7 @@ class Binary {
 	public:
 		Binary(string cmd);
 		string Run(string input);
+//		string Run(string input, int timelimit);
 	private:
 		string dir, cmd;
 
