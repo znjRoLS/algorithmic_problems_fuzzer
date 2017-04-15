@@ -22,6 +22,7 @@ public:
   virtual void GenerateValue() = 0;
   void SetName(string);
   string GetName();
+  virtual string GetType() = 0;
 
 protected:
   bool isUpperLimitVar;
@@ -43,6 +44,7 @@ public:
   void GenerateValue() override;
 
   void SetValue(int val);
+  string GetType() override;
 
 private:
   int value;
@@ -57,6 +59,7 @@ public:
   using Variable::SetUpperLimit;
   void SetUpperLimit(int val);
   void SetLowerLimit(int val);
+  string GetType() override;
 
 protected:
   int upperInt;
@@ -74,6 +77,7 @@ public:
   using Variable::SetUpperLimit;
   void SetUpperLimit(double val);
   void SetLowerLimit(double val);
+  string GetType() override;
 
 protected:
   double upperInt;
@@ -86,9 +90,25 @@ class VariablePermutation: public VariableInt {
 public:
   string GetValue() override;
   void GenerateValue() override;
+  string GetType() override;
 
 private:
   vector<int> permutation;
+
+};
+
+
+class VariableChar: public Variable {
+public:
+  string GetValue() override;
+  void GenerateValue() override;
+  string GetType() override;
+
+  void SetUpper();
+  void SetLower();
+private:
+  bool isUpper;
+  char value;
 
 };
 

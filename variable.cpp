@@ -36,6 +36,11 @@ inline void SetRandomVar(double x_min, double x_max, double &x) {
   x = x_min + x * (x_max - x_min);
 }
 
+inline void SetRandomVar(char x_min, char x_max, char &x) {
+  SetSeedIfNeeded();
+  x = rand() % (x_max - x_min + 1) + x_min;
+}
+
 inline void SetRandomPermutation(int x_min, int x_max, vector<int>& perm) {
   SetSeedIfNeeded();
   perm.clear();
@@ -106,6 +111,10 @@ void VariableInt::SetLowerLimit(int val) {
   isLowerLimitVar = false;
 }
 
+string VariableInt::GetType() {
+  return "int";
+}
+
 
 void VariableDouble::GenerateValue() {
   if (isUpperLimitVar) {
@@ -133,6 +142,11 @@ void VariableDouble::SetLowerLimit(double val) {
   isLowerLimitVar = false;
 };
 
+
+string VariableDouble::GetType() {
+  return "double";
+}
+
 void VariableIntConstant::GenerateValue() {
 }
 
@@ -144,6 +158,11 @@ void VariableIntConstant::SetValue(int val) {
 string VariableIntConstant::GetValue() {
   return to_string(value);
 };
+
+
+string VariableIntConstant::GetType() {
+  return "int";
+}
 
 
 void VariablePermutation::GenerateValue() {
@@ -170,4 +189,32 @@ string VariablePermutation::GetValue() {
   }
 
   return ss.str();
+}
+
+string VariablePermutation::GetType() {
+  return "permutation";
+}
+
+
+void VariableChar::SetLower() {
+  isUpper = false;
+}
+
+void VariableChar::SetUpper() {
+  isUpper = true;
+}
+
+void VariableChar::GenerateValue() {
+  SetRandomVar('a', 'z', value);
+  if (isUpper) {
+    value += 'A' - 'a';
+  }
+}
+
+string VariableChar::GetValue() {
+  return string(1, value);
+}
+
+string VariableChar::GetType() {
+  return "char";
 }

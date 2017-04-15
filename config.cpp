@@ -8,8 +8,21 @@
 #include <cstdlib>
 #include <ctime>
 #include <unordered_map>
+#include <functional>
 
 using namespace std;
+
+unordered_map<string,function<unique_ptr<Variable>()>> variable_constructors = {
+    {"int", []()->unique_ptr<Variable> {
+      return unique_ptr<Variable>(new VariableInt());
+    }},
+    {"permutation", []()->unique_ptr<Variable> {
+      return unique_ptr<Variable>(new VariablePermutation());
+    }},
+    {"char", []()->unique_ptr<Variable> {
+      return unique_ptr<Variable>(new VariableChar());
+    }},
+};
 
 Config::Config():
     rootBlock(new BlockComposition()) {
@@ -135,17 +148,28 @@ void Config::ParseVar(string input) {
 
     //TODO@rols: check if exists
     //TODO@rols: hashmap for types?
-    if (tokens[0] == "int") {
+    if (variable_constructors.find(tokens[0]) != variable_constructors.end()) {
       for(string &token: varsVector) {
-        vars[token] =  unique_ptr<Variable>(new VariableInt());
-        vars[token]->SetName(token);
+        vars[token] = variable_constructors[tokens[0]]();
       }
-    } else if (tokens[0] == "permutation") {
-      for(string &token: varsVector) {
-        vars[token] = unique_ptr<Variable>(new VariablePermutation());
-        vars[token]->SetName(token);
-      }
+    } else {
+      cerr << "Variable type not defined! " << tokens[0] << endl;
     }
+//    if (tokens[0] == "int") {
+//      for(string &token: varsVector) {
+//        vars[token] =  unique_ptr<Variable>(new VariableInt());
+//        vars[token]->SetName(token);
+//      }
+//    } else if (tokens[0] == "permutation") {
+//      for(string &token: varsVector) {
+//        vars[token] = unique_ptr<Variable>(new VariablePermutation());
+//        vars[token]->SetName(token);
+//      }
+//    } else if (tokens[0] == "char") {
+//      for (string &token: varsVector) {
+//
+//      }
+//    }
   }
 }
 
@@ -197,31 +221,40 @@ void Config::ParseConstraints(string input) {
     }
     shared_ptr<Variable> firstVar = vars[firstParam];
 
-    if (vars.find(secondParam) != vars.end()) {
+    if (firstVar->GetType() == "char") {
+      if (foundToken == ">")
+        dynamic_pointer_cast<VariableChar>(firstVar)->SetUpper();
+      if (foundToken == "<")
+        dynamic_pointer_cast<VariableChar>(firstVar)->SetLower();
 
-      if (foundToken == "<=") {
-        firstVar->SetUpperLimit(vars[secondParam]);
-        firstVar->SetUpperLimitInclusive(true);
-      }
-      if (foundToken == ">=") {
-        firstVar->SetLowerLimit(vars[secondParam]);
-        firstVar->SetLowerLimitInclusive(true);
-      }
-      if (foundToken == "<") {
-        firstVar->SetUpperLimit(vars[secondParam]);
-        firstVar->SetUpperLimitInclusive(false);
-      }
-      if (foundToken == ">") {
-        firstVar->SetLowerLimit(vars[secondParam]);
-        firstVar->SetLowerLimitInclusive(false);
-      }
-      if (foundToken == "=") {
-        firstVar->SetUpperLimit(vars[secondParam]);
-        firstVar->SetUpperLimitInclusive(true);
-        firstVar->SetLowerLimit(vars[secondParam]);
-        firstVar->SetLowerLimitInclusive(true);
-      }
       continue;
+    } else if (firstVar->GetType() == "int") {
+      if (vars.find(secondParam) != vars.end()) {
+
+        if (foundToken == "<=") {
+          firstVar->SetUpperLimit(vars[secondParam]);
+          firstVar->SetUpperLimitInclusive(true);
+        }
+        if (foundToken == ">=") {
+          firstVar->SetLowerLimit(vars[secondParam]);
+          firstVar->SetLowerLimitInclusive(true);
+        }
+        if (foundToken == "<") {
+          firstVar->SetUpperLimit(vars[secondParam]);
+          firstVar->SetUpperLimitInclusive(false);
+        }
+        if (foundToken == ">") {
+          firstVar->SetLowerLimit(vars[secondParam]);
+          firstVar->SetLowerLimitInclusive(false);
+        }
+        if (foundToken == "=") {
+          firstVar->SetUpperLimit(vars[secondParam]);
+          firstVar->SetUpperLimitInclusive(true);
+          firstVar->SetLowerLimit(vars[secondParam]);
+          firstVar->SetLowerLimitInclusive(true);
+        }
+        continue;
+      }
     }
 
     shared_ptr<VariableInt> tryFirstCast = dynamic_pointer_cast<VariableInt>(firstVar);
@@ -247,6 +280,12 @@ void Config::ParseConstraints(string input) {
     if (foundToken == ">") {
       tryFirstCast->SetLowerLimit(second);
       tryFirstCast->SetLowerLimitInclusive(false);
+    }
+    if (foundToken == "=") {
+      tryFirstCast->SetUpperLimit(second);
+      tryFirstCast->SetUpperLimitInclusive(true);
+      tryFirstCast->SetLowerLimit(second);
+      tryFirstCast->SetLowerLimitInclusive(true);
     }
   }
 
