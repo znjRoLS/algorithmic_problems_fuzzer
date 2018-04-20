@@ -205,7 +205,7 @@ void VariableChar::SetUpper() {
 }
 
 void VariableChar::GenerateValue() {
-  SetRandomVar('a', 'z', value);
+  SetRandomVar(lowerChar, upperChar, value);
   if (isUpper) {
     value += 'A' - 'a';
   }
@@ -217,4 +217,15 @@ string VariableChar::GetValue() {
 
 string VariableChar::GetType() {
   return "char";
+}
+
+
+void VariableChar::SetUpperLimit(char val) {
+  upperChar = val;
+  isUpperLimitVar = false;
+}
+
+void VariableChar::SetLowerLimit(char val) {
+  lowerChar = val;
+  isLowerLimitVar = false;
 }

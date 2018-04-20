@@ -222,10 +222,14 @@ void Config::ParseConstraints(string input) {
     shared_ptr<Variable> firstVar = vars[firstParam];
 
     if (firstVar->GetType() == "char") {
-      if (foundToken == ">")
-        dynamic_pointer_cast<VariableChar>(firstVar)->SetUpper();
       if (foundToken == "<")
-        dynamic_pointer_cast<VariableChar>(firstVar)->SetLower();
+        dynamic_pointer_cast<VariableChar>(firstVar)->SetUpperLimit(secondParam[0]-1);
+      if (foundToken == ">")
+        dynamic_pointer_cast<VariableChar>(firstVar)->SetLowerLimit(secondParam[0]+1);
+        if (foundToken == "<=")
+            dynamic_pointer_cast<VariableChar>(firstVar)->SetUpperLimit(secondParam[0]);
+        if (foundToken == ">=")
+            dynamic_pointer_cast<VariableChar>(firstVar)->SetLowerLimit(secondParam[0]);
 
       continue;
     } else if (firstVar->GetType() == "int") {

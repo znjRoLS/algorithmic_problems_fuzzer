@@ -106,7 +106,11 @@ public:
 
   void SetUpper();
   void SetLower();
+    void SetUpperLimit(char val);
+    void SetLowerLimit(char val);
 private:
+    char upperChar='z';
+    char lowerChar='a';
   bool isUpper;
   char value;
 

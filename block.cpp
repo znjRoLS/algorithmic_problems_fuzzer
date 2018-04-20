@@ -188,6 +188,13 @@ bool Block::ParseInputBlock(
         unordered_map<string,shared_ptr<Variable>>& vars) {
     //cout << "ParseInputBlock {" << endl;
 
+    bool noregenerate = false;
+
+    if (token[0] == '!') {
+        token = token.substr(1);
+        noregenerate = true;
+    }
+
     if (vars.find(token) == vars.end()) {
 //            cout << "Error parsing config" << endl;
 //            exit(255);
@@ -199,6 +206,7 @@ bool Block::ParseInputBlock(
     if (blockType == BlockType::ECHO) {
         unique_ptr<BlockSimple> blockSimple(new BlockSimple());
         blockSimple->SetEchoVar(vars[token]);
+        blockSimple->SetRegenerate(!noregenerate);
         block = static_unique_pointer_cast<Block,BlockSimple>(move(blockSimple));
         //cout << "ParseInputBlock }" << endl;
 
@@ -208,6 +216,7 @@ bool Block::ParseInputBlock(
     if (blockType == BlockType::REPEAT) {
         unique_ptr<BlockComposition> blockComposition(new BlockComposition());
         blockComposition->SetRepeatVar(vars[token]);
+        blockComposition->SetRegenerate(!noregenerate);
         if (!Block::GetNextInputBlock(input, blockComposition, vars)) {
             //cout << "**** if (!Block::GetNextInputBlock(input, blockComposition, vars)) - RETURNED FALSE" << endl;
             //cout << "ParseInputBlock }" << endl;
@@ -337,8 +346,18 @@ string BlockCondition::GetGeneratedText() {
     return cases[conditionVal]->GetGeneratedText();
 }
 
+void BlockSimple::SetRegenerate(bool regenerate) {
+    _regenerate = regenerate;
+}
+
+void BlockComposition::SetRegenerate(bool regenerate) {
+    _regenerate = regenerate;
+}
+
 void BlockSimple::GenerateSelfVar() {
-    echoVar->GenerateValue();
+    if (_regenerate) {
+        echoVar->GenerateValue();
+    }
 }
 
 void BlockComposition::VariablesGeneration() {
@@ -348,7 +367,9 @@ void BlockComposition::VariablesGeneration() {
 }
 
 void BlockComposition::GenerateSelfVar() {
-    repeatVar->GenerateValue();
+    if (_regenerate) {
+        repeatVar->GenerateValue();
+    }
 }
 
 void BlockCondition::GenerateSelfVar() {

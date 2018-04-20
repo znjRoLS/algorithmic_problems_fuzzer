@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+#include <pthread.h>
 
 #include "common.h"
 #include "binary_runner.h"

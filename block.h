@@ -30,6 +30,7 @@ static unordered_map<char,int> BLOCK_CHARS = {
 static const char BLOCK_START = '{';
 static const char BLOCK_END = '}';
 static const char CONDITION_DELIMITER = '@';
+static const char NO_REGENERATION = '!';
 
 
 class BlockComposition;
@@ -79,8 +80,10 @@ public:
     void GenerateSelfVar() override;
     void SetEchoVar(shared_ptr<Variable> var);
     shared_ptr<Variable> GetEchoVar();
+    void SetRegenerate(bool regenerate);
 private:
     shared_ptr<Variable> echoVar;
+    bool _regenerate = true;
 };
 
 class BlockComposition: public Block {
@@ -93,11 +96,13 @@ public:
     void AddTextFill(string textFill);
     void SetRepeatVar(shared_ptr<Variable> var);
     shared_ptr<Variable> GetRepeatVar();
+    void SetRegenerate(bool regenerate);
 private:
     //TODO: only int variables?
     shared_ptr<Variable> repeatVar;
     vector<unique_ptr<Block> >  composition;
     vector<string> textFills;
+    bool _regenerate = true;
 };
 
 class BlockCondition: public Block {
