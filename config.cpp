@@ -9,6 +9,7 @@
 #include <ctime>
 #include <unordered_map>
 #include <functional>
+#include <cassert>
 
 using namespace std;
 
@@ -148,11 +149,11 @@ void Config::ParseParams(string input) {
     inputstream << input;
 
     learn_parameters.clear();
-    
+
     while (!inputstream.eof()) {
         string line;
         getline(inputstream, line);
-        
+
         vector<string> tokens = split(line, ':');
         LearnParam param;
         param.name = tokens[0];
@@ -162,7 +163,7 @@ void Config::ParseParams(string input) {
         if (tokens[1] == "LINEAR") param.scale = LINEAR;
         else if (tokens[1] == "LOG") param.scale = LOG;
         else assert(false);
-        
+
         learn_parameters.push_back(param);
     }
 }

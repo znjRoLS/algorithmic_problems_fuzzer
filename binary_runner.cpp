@@ -6,6 +6,7 @@
 #include "binary_runner.h"
 
 #include <errno.h>
+#include <cstring>
 
 Binary::Binary(string _cmd) :
         cmd(_cmd) {
