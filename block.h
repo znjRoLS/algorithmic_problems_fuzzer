@@ -11,6 +11,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
+#include <unordered_set>
 
 using namespace std;
 
@@ -60,6 +61,7 @@ public:
             stringstream& input,
             unique_ptr<BlockComposition>& block,
             int& value,
+            bool& lessthan,
             unordered_map<string,shared_ptr<Variable>>& vars
     );
 
@@ -113,12 +115,15 @@ public:
     void GenerateSelfVar() override;
     void SetConditionVar(shared_ptr<Variable> var);
     shared_ptr<Variable> GetConditionVar();
-    void AddCase(int val, unique_ptr<BlockComposition>& blockComposition);
+    void AddCase(int val, bool less_than, unique_ptr<BlockComposition>& blockComposition);
+    void AddDefaultCase(unique_ptr<BlockComposition>& blockComposition);
 private:
     //TODO: uskladi se, uniqeu, shared...
     shared_ptr<Variable> conditionVar;
     //TODO: make unordered_map<Variable...
     unordered_map<int, unique_ptr<BlockComposition>> cases;
+    unordered_set<int> less_than;
+    unique_ptr<BlockComposition> default_case;
     //TODO: add true and false cases
     //TODO: add izraze as case condition
 };

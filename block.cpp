@@ -126,11 +126,13 @@ bool Block::GetOneCaseBlock(
         stringstream& input,
         unique_ptr<BlockComposition>& block,
         int& value,
+        bool& lessthan,
         unordered_map<string,shared_ptr<Variable>>& vars) {
     //cout << "GetOneCaseBlock {" << endl;
     char c;
     stringstream token;
     stringstream blockInput;
+    lessthan = false;
 
     bool insideBlock = false;
     bool insideToken = false;
@@ -153,7 +155,12 @@ bool Block::GetOneCaseBlock(
                     //cout << "GetOneCaseBlock }" << endl;
                     return false;
                 }
-                value = stoi(token.str());
+                if (token.str()[0] == '<') {
+                    lessthan = true;
+                    value = stoi(token.str().substr(1));
+                } else {
+                    value = stoi(token.str());
+                }
                 break;
             }
             blockInput << c;
@@ -233,17 +240,22 @@ bool Block::ParseInputBlock(
         blockCondition->SetConditionVar(vars[token]);
         while(input) {
             int caseVal;
+            bool lessthan;
             unique_ptr<BlockComposition> blockComposition(new BlockComposition());
             //TODO: daj bre ulepsaj ovo malo
             shared_ptr<VariableIntConstant> unityVar = make_shared<VariableIntConstant>();
             unityVar->SetValue(1);
             blockComposition->SetRepeatVar(static_pointer_cast<Variable>(unityVar));
-            if (!GetOneCaseBlock(input, blockComposition, caseVal, vars)) {
+            if (!GetOneCaseBlock(input, blockComposition, caseVal, lessthan, vars)) {
                 //cout << "**** if (!GetOneCaseBlock(input, blockComposition, caseVal, vars)) - RETURNED FALSE" << endl;
                 //cout << "naaah, just break instead" << endl;
                 break;
             }
-            blockCondition->AddCase(caseVal, blockComposition);
+            if (caseVal == -1) {
+                blockCondition->AddDefaultCase(blockComposition);
+            } else {
+                blockCondition->AddCase(caseVal, lessthan, blockComposition);
+            }
         }
         block = static_unique_pointer_cast<Block,BlockCondition>(move(blockCondition));
         //cout << "ParseInputBlock }" << endl;
@@ -297,8 +309,15 @@ shared_ptr<Variable> BlockCondition::GetConditionVar() {
     return conditionVar;
 }
 
-void BlockCondition::AddCase(int val, unique_ptr<BlockComposition>& blockComposition) {
+void BlockCondition::AddCase(int val, bool less, unique_ptr<BlockComposition>& blockComposition) {
     cases[val] = move(blockComposition);
+    if (less) {
+        less_than.insert(val);
+    }
+}
+
+void BlockCondition::AddDefaultCase(unique_ptr<BlockComposition> &blockComposition) {
+    default_case = move(blockComposition);
 }
 
 //TODO: topological value generation ( x y, and we have x < y and y < 100 for instance)
@@ -339,7 +358,19 @@ string BlockCondition::GetGeneratedText() {
     int conditionVal = stoi(conditionVar->GetValue());
 
     if (cases.find(conditionVal) == cases.end()) {
-        cout << "err";
+
+        // TODO: ne, ovo ne treba ovako da radi
+        for (int less : less_than) {
+            if (less > conditionVal) {
+                return cases[less]->GetGeneratedText();
+            }
+        }
+
+        if (default_case != nullptr) {
+            return default_case->GetGeneratedText();
+        }
+
+        cout << "error with cases generate";
         exit(255);
     }
 
