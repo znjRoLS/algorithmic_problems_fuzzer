@@ -66,7 +66,7 @@ string Binary::GetOutput(int pipe_id) {
 //	return output.str();
 }
 
-string Binary::Run(string input, char *args[]) {
+string Binary::Run(string input, vector<string> args) {
 
     pid_t nPid;
     int pipeto[2];      /* pipe to feed the exec'ed program input */
@@ -96,7 +96,7 @@ string Binary::Run(string input, char *args[]) {
         close(pipefrom[1]);
         /* call od as an example, with hex and char output */
 
-        if (args == nullptr) {
+        if (args.size() == 0) {
             execlp(cmd.c_str(), cmd.c_str(), NULL);
         } else {
 //            cout << "first arg " << endl;
@@ -105,7 +105,20 @@ string Binary::Run(string input, char *args[]) {
 //            for (int i = 0; i < 6; i ++) {
 //                cout << args[i] << endl;
 //            }
-            execvp(cmd.c_str(), args);
+            char ** real_args = new char*[args.size()+2];
+            real_args[0] = new char[cmd.size()+1];
+            strcpy(real_args[0], cmd.c_str());
+
+            for (int i = 0 ; i < args.size(); i ++) {
+                real_args[i+1] = new char[args[i].size() + 1];
+                strcpy(real_args[i+1], args[i].c_str());
+            }
+            real_args[args.size()+1] = 0;
+
+            execvp(cmd.c_str(), real_args);
+
+            for (int i = 0 ; i < args.size() + 1; i ++) delete [] real_args[i];
+            delete [] real_args;
         }
         int err = errno;
 

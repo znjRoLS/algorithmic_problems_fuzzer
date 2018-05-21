@@ -24,18 +24,10 @@ _valid(false) {
         }
     }
 
-    _args = new char*[_params.size()];
-    for (int i = 0 ; i < _params.size(); i ++) {
-        _args[i] = new char[50];
-    }
 
 }
 
 LearnParamAllPermutations::~LearnParamAllPermutations() {
-    for (int i = 0 ; i < _params.size(); i ++) {
-        delete [] _args[i];
-    }
-    delete [] _args;
 }
 
 bool LearnParamAllPermutations::IsValid() {
@@ -68,12 +60,11 @@ string LearnParamAllPermutations::ToString() {
     return ss.str();
 }
 
-char ** LearnParamAllPermutations::GetArgs() {
-    stringstream ss;
+vector<string> LearnParamAllPermutations::GetArgs() {
+    vector<string> res;
     for (int i = 0 ; i < _params.size(); i++) {
         string arg = _params[i].name + "=" + std::to_string(_param_vals[i][_indexes[i]]);
-        memcpy(_args[i], arg.c_str(), arg.size());
-        _args[i][arg.size()] = '\0';
+        res.push_back(arg);
     }
-    return _args;
+    return res;
 }

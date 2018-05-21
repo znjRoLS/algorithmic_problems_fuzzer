@@ -28,7 +28,6 @@ class LearnParamAllPermutations {
     vector<vector<double>> _param_vals;
     vector<int> _indexes;
     bool _valid;
-    char ** _args;
 
 public:
     LearnParamAllPermutations(vector<LearnParam> params);
@@ -42,7 +41,7 @@ public:
 
     string ToString();
 
-    char ** GetArgs();
+    vector<string> GetArgs();
 };
 
 

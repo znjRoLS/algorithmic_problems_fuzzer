@@ -46,6 +46,22 @@ int main(int argc, char **argv) {
 
     int global_iter_num = 0;
     multimap<double,string> global_results;
+
+    vector<string> inputs;
+    for (int iter_num = 0; iter_num < iterations_per_learn; iter_num++) {
+
+        string program_input;
+
+        if (generate_binary) {
+            Binary prog(config.GetParam("binary_prefix", "") + generator_binary);
+            program_input = prog.Run("");
+        } else {
+            program_input = config.GetInput();
+        }
+
+        inputs.push_back(program_input);
+    }
+
     while (learner.IsValid()) {
 
         Binary prog(binary_path);
@@ -59,29 +75,15 @@ int main(int argc, char **argv) {
 
         double thresh = 200;
 
+
+
         for (int iter_num = 0; iter_num < iterations_per_learn; iter_num++) {
-
-            string program_input;
-
-            if (generate_binary) {
-                Binary prog(config.GetParam("binary_prefix", "") + generator_binary);
-                program_input = prog.Run("");
-            } else {
-                program_input = config.GetInput();
-            }
+            string program_input = inputs[iter_num];
 
 //            cout << "Running: " << binary_path << endl;
 //            cout <<	"With input: " << program_input << endl;
 
-            char **args = learner.GetArgs();
-            char **real_args = new char*[learn_parameters.size() + 2];
-            real_args[0] = new char[100];
-            memcpy(real_args[0], binary_path.c_str(), binary_path.size());
-            real_args[0][binary_path.size()] = '\0';
-            for (int i = 0 ; i < learn_parameters.size(); i ++) real_args[i+1] = args[i];
-            real_args[learn_parameters.size()+1] = nullptr;
-
-            string output = prog.Run(program_input, real_args);
+            string output = prog.Run(program_input, learner.GetArgs());
 
 //            cout << "OUT " << output << endl;
             double score = stod(output);
@@ -100,11 +102,6 @@ int main(int argc, char **argv) {
             cout << "iter " << iter_num << "\tcurr\t" << score << "\tmin\t" << min_score \
                 << "\tmax\t" << max_score << "\tavg\t" << sum/num << endl;
 
-            //delete [] real_args[learn_parameters.size() + 1];
-            delete [] real_args[0];
-            delete [] real_args;
-
-//            double score = stod(output);
 
             if (++global_iter_num == max_interations) return 0;
         }
