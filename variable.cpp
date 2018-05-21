@@ -196,19 +196,19 @@ string VariablePermutation::GetType() {
 }
 
 
-void VariableChar::SetLower() {
-  isUpper = false;
-}
-
-void VariableChar::SetUpper() {
-  isUpper = true;
-}
+//void VariableChar::SetLower() {
+//  isUpper = false;
+//}
+//
+//void VariableChar::SetUpper() {
+//  isUpper = true;
+//}
 
 void VariableChar::GenerateValue() {
   SetRandomVar(lowerChar, upperChar, value);
-  if (isUpper) {
-    value += 'A' - 'a';
-  }
+//  if (isUpper) {
+//    value += 'A' - 'a';
+//  }
 }
 
 string VariableChar::GetValue() {

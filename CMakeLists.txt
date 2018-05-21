@@ -11,8 +11,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 project (fuzzer)
 
-add_executable(fuzzer fuzzer.cpp binary_runner.cpp common.cpp config.cpp block.cpp block.h variable.cpp variable.h)
+add_executable(fuzzer fuzzer.cpp binary_runner.cpp common.cpp config.cpp block.cpp variable.cpp)
 #add_executable(test_bin test_bin.cpp)
+
+add_executable(learner learn.cpp learn_param.cpp binary_runner.cpp common.cpp config.cpp block.cpp variable.cpp)
 
 if (false)
 include_directories(googletest/googletest/include)

@@ -53,6 +53,22 @@ void Config::Parse(ifstream& config_file) {
       break;
     }
 
+      if (line == PARAMS_START_LINE) {
+          stringstream input_config;
+          bool first = true;
+          while (1) {
+              getline(config_file,line);
+              if (line == PARAMS_END_LINE) {
+                  //config_file >> line;
+                  Config::ParseParams(input_config.str());
+                  break;
+              }
+              if (!first) input_config << endl;
+              first = false;
+              input_config << line;
+          }
+          continue;
+      }
     if (line == INPUT_START_LINE) {
       stringstream input_config;
       bool first = true;
@@ -125,6 +141,30 @@ void Config::Parse(ifstream& config_file) {
     binaries.push_back(bin_prefix + binary);
   }
 
+}
+
+void Config::ParseParams(string input) {
+    stringstream inputstream;
+    inputstream << input;
+
+    learn_parameters.clear();
+    
+    while (!inputstream.eof()) {
+        string line;
+        getline(inputstream, line);
+        
+        vector<string> tokens = split(line, ':');
+        LearnParam param;
+        param.name = tokens[0];
+        param.minval = stod(tokens[2]);
+        param.maxval = stod(tokens[3]);
+        param.numpoints = stoi(tokens[4]);
+        if (tokens[1] == "LINEAR") param.scale = LINEAR;
+        else if (tokens[1] == "LOG") param.scale = LOG;
+        else assert(false);
+        
+        learn_parameters.push_back(param);
+    }
 }
 
 void Config::ParseVar(string input) {
@@ -306,4 +346,8 @@ string Config::GetInput() {
 string Config::GetParam(string name, string defaultVal) {
   if (confParams.find(name) == confParams.end()) return defaultVal;
   return confParams[name];
+}
+
+vector<LearnParam> Config::GetLearnParameters() {
+    return learn_parameters;
 }

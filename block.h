@@ -30,6 +30,7 @@ static unordered_map<char,int> BLOCK_CHARS = {
 static const char BLOCK_START = '{';
 static const char BLOCK_END = '}';
 static const char CONDITION_DELIMITER = '@';
+// TODO: make this happen
 static const char NO_REGENERATION = '!';
 
 

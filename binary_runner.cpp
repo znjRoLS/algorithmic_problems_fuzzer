@@ -5,14 +5,16 @@
 
 #include "binary_runner.h"
 
-Binary::Binary(string _cmd):
-	cmd(_cmd) {
+#include <errno.h>
+
+Binary::Binary(string _cmd) :
+        cmd(_cmd) {
 
 }
 
 void Binary::PutInput(string input, int pipe_id) {
 
-	write(pipe_id, input.c_str(), input.length());
+    write(pipe_id, input.c_str(), input.length());
 
 //	FILE *stream;
 
@@ -22,28 +24,27 @@ void Binary::PutInput(string input, int pipe_id) {
 //	}
 
 //	fputs(input.c_str(), stream);
-	close(pipe_id);
+    close(pipe_id);
 }
 
 
 string Binary::GetOutput(int pipe_id) {
 
-	stringstream receive_output;
-char readbuffer[80];
+    stringstream receive_output;
+    char readbuffer[80];
 
-while (1)
-{
-	int bytes_read = read(pipe_id, readbuffer, sizeof(readbuffer)-1);
+    while (1) {
+        int bytes_read = read(pipe_id, readbuffer, sizeof(readbuffer) - 1);
 
-		if (bytes_read <= 0)
-				break;
+        if (bytes_read <= 0)
+            break;
 
-		readbuffer[bytes_read] = '\0';
-		receive_output << readbuffer;
-}
-close(pipe_id);
+        readbuffer[bytes_read] = '\0';
+        receive_output << readbuffer;
+    }
+    close(pipe_id);
 
-return receive_output.str();
+    return receive_output.str();
 
 
 //	FILE *stream;
@@ -65,54 +66,63 @@ return receive_output.str();
 //	return output.str();
 }
 
-string Binary::Run(string input) {
+string Binary::Run(string input, char *args[]) {
 
-	pid_t nPid;
-	int pipeto[2];      /* pipe to feed the exec'ed program input */
-	int pipefrom[2];    /* pipe to get the exec'ed program output */
+    pid_t nPid;
+    int pipeto[2];      /* pipe to feed the exec'ed program input */
+    int pipefrom[2];    /* pipe to get the exec'ed program output */
 
-	if ( pipe( pipeto ) != 0 )
-	{
-			perror( "pipe() to" );
-			exit(255);
-	}
-	if ( pipe( pipefrom ) != 0 )
-	{
-			perror( "pipe() from" );
-			exit(255);
-	}
+    if (pipe(pipeto) != 0) {
+        perror("pipe() to");
+        exit(255);
+    }
+    if (pipe(pipefrom) != 0) {
+        perror("pipe() from");
+        exit(255);
+    }
 
-	nPid = fork();
-	if ( nPid < 0 )
-	{
-			perror( "fork() 1" );
-			exit(255);
-	}
-	else if (nPid == 0) {
-			/* dup pipe read/write to stdin/stdout */
-			dup2(pipeto[0], 0);
-			dup2(pipefrom[1], 1);
-			/* close unnecessary pipe descriptors for a clean environment */
-			close(pipeto[0]);
-			close(pipeto[1]);
-			close(pipefrom[0]);
-			close(pipefrom[1]);
-			/* call od as an example, with hex and char output */
-			
-			execlp(cmd.c_str(), cmd.c_str(), (char *)NULL );
-			cout << "error, so executing cat...." << endl;
-			execlp("/bin/cat", "/bin/cat", (char *)NULL);
-			perror("execlp()");
-			exit(255);
-  }
-	
-	/* Close unused pipe ends. This is especially important for the
-	* pipefrom[1] write descriptor, otherwise ReadFromPipe will never 
-	* get an EOF. */
-	close(pipeto[0]);
-	close(pipefrom[1]);
+    nPid = fork();
+    if (nPid < 0) {
+        perror("fork() 1");
+        exit(255);
+    } else if (nPid == 0) {
+        /* dup pipe read/write to stdin/stdout */
+        dup2(pipeto[0], 0);
+        dup2(pipefrom[1], 1);
+        /* close unnecessary pipe descriptors for a clean environment */
+        close(pipeto[0]);
+        close(pipeto[1]);
+        close(pipefrom[0]);
+        close(pipefrom[1]);
+        /* call od as an example, with hex and char output */
 
-	PutInput(input, pipeto[1]);
+        if (args == nullptr) {
+            execlp(cmd.c_str(), cmd.c_str(), NULL);
+        } else {
+//            cout << "first arg " << endl;
+//            cout << cmd.c_str() << endl;
+//            cout << "second arg " << endl;
+//            for (int i = 0; i < 6; i ++) {
+//                cout << args[i] << endl;
+//            }
+            execvp(cmd.c_str(), args);
+        }
+        int err = errno;
+
+        cout << "error, so executing cat...." << endl;
+        cout << "error: " << err << endl;
+        execlp("/bin/cat", "/bin/cat", (char *) NULL);
+        perror("execlp()");
+        exit(255);
+    }
+
+    /* Close unused pipe ends. This is especially important for the
+    * pipefrom[1] write descriptor, otherwise ReadFromPipe will never
+    * get an EOF. */
+    close(pipeto[0]);
+    close(pipefrom[1]);
+
+    PutInput(input, pipeto[1]);
 
 //	sleep(2);
 //
@@ -149,10 +159,10 @@ string Binary::Run(string input) {
 //    }
 
 
-	string output = GetOutput(pipefrom[0]);
+    string output = GetOutput(pipefrom[0]);
 
     int status;
-	waitpid(nPid, &status, 0);
+    waitpid(nPid, &status, 0);
 
-	return output;
+    return output;
 }
