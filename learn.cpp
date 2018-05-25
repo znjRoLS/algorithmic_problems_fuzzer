@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
     agents.push_back({learn_parameters, vals});
     for (int i = 0 ; i < learn_parameters.size(); i ++) {
         LearnParam& param = learn_parameters[i];
-        double step_val = (param.maxval - param.minval) / param.numpoints;
+        double step_val = (param.maxval - param.minval) / (param.numpoints-1);
         for (int step = 0; step < param.numpoints; step ++) {
             double val = param.minval + step * step_val;
             if (fabs(val) < 1e-7) continue;
