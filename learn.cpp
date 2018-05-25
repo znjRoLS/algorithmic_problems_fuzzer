@@ -344,6 +344,7 @@ int main(int argc, char **argv) {
         double max_score = 0;
         double min_score = 0;
         double sum = 0;
+        double thresh = 20;
 
         for (int iter_num = 0; iter_num < iterations_per_learn; iter_num++) {
             string program_input = inputs[iter_num];
@@ -353,13 +354,15 @@ int main(int argc, char **argv) {
 //            cout << "OUT " << output << endl;
             double score = stod(output);
 
-            num ++;
-            if (num == 1) {
-                min_score = max_score = sum = score;
-            } else {
-                min_score = min (min_score, score);
-                max_score = max (max_score, score);
-                sum += score;
+            if (score > thresh) {
+                num ++;
+                if (num == 1) {
+                    min_score = max_score = sum = score;
+                } else {
+                    min_score = min (min_score, score);
+                    max_score = max (max_score, score);
+                    sum += score;
+                }
             }
 
             cout << "iter " << iter_num << "\tcurr\t" << score << "\tmin\t" << min_score \
@@ -377,20 +380,20 @@ int main(int argc, char **argv) {
         curr_agent++;
         if (curr_agent == agents.size()) {
             curr_agent = 0;
-//            inputs.clear();
-//            for (int iter_num = 0; iter_num < iterations_per_learn; iter_num++) {
-//
-//                string program_input;
-//
-//                if (generate_binary) {
-//                    Binary prog(config.GetParam("binary_prefix", "") + generator_binary);
-//                    program_input = prog.Run("");
-//                } else {
-//                    program_input = config.GetInput();
-//                }
-//
-//                inputs.push_back(program_input);
-//            }
+            inputs.clear();
+            for (int iter_num = 0; iter_num < iterations_per_learn; iter_num++) {
+
+                string program_input;
+
+                if (generate_binary) {
+                    Binary prog(config.GetParam("binary_prefix", "") + generator_binary);
+                    program_input = prog.Run("");
+                } else {
+                    program_input = config.GetInput();
+                }
+
+                inputs.push_back(program_input);
+            }
         }
     }
 
